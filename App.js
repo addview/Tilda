@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Text, View, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
@@ -16,9 +22,13 @@ export default function App() {
     return moment().add(3, "days").format("dddd, Do MMMM , HH:mm");
   };
 
+  const addFiftheenDays = () => {
+    return moment().add(15, "days").format("dddd, Do MMMM , HH:mm");
+  };
+
   const saveInsulinData = async (insulinDatum) => {
     try {
-      console.log(insulindatum);
+      console.log(insulinDatum);
       await AsyncStorage.setItem("insulin", insulinDatum);
     } catch (error) {
       alert(error);
@@ -50,7 +60,9 @@ export default function App() {
       // remove error
     }
 
-    setInsulinData("");
+    setInsulinData("Ingen datum registrerad");
+    setSensorData("Ingen datum registrerad");
+    setNeedleData("Ingen datum registrerad");
 
     console.log("Done");
   };
@@ -95,15 +107,15 @@ export default function App() {
     saveNeedleData(_needledate);
   };
   const onPressSensor = () => {
-    const _sensordate = addThreeDays();
+    const _sensordate = addFiftheenDays();
     setSensorData(_sensordate);
     saveSensorData(_sensordate);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="bg-fuchsia-200" style={{ flex: 1 }}>
       <View className="flex-1 justify-between">
-        <View className="flex-1 items-center justify-center bg-[#313866]">
+        <View className="m-2 flex-1 items-center justify-center bg-[#313866]">
           <TouchableOpacity
             className="w-24 h-24  bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressInsulin(moment.now())}
@@ -115,7 +127,7 @@ export default function App() {
           </Text>
         </View>
 
-        <View className="flex-1 items-center justify-center  bg-[#504099]">
+        <View className="m-2 flex-1 items-center justify-center  bg-[#504099]">
           <TouchableOpacity
             className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressSensor(moment.now())}
@@ -127,16 +139,25 @@ export default function App() {
           </Text>
         </View>
 
-        <View className="flex-1 items-center justify-center bg-[#974EC3]">
+        <View className="m-2 flex-1 items-center justify-center bg-[#974EC3]">
           <TouchableOpacity
             className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
-            onPress={() => removeFew()}
+            onPress={() => onPressNeedle(moment.now())}
           >
             <Text className="text-white text-lg font-bold">Nål</Text>
           </TouchableOpacity>
           <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
             {needleData}
           </Text>
+        </View>
+
+        <View className="m-2 p-2  items-center justify-center ">
+          <TouchableOpacity
+            className="w-16 h-16 bg-[#FE7BE5] rounded-full items-center justify-center"
+            onPress={() => removeFew()}
+          >
+            <Text className="text-white text-sm font-bold">Rensa</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
