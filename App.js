@@ -5,11 +5,17 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  StyleSheet,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import "moment/locale/sv";
+
+const styles = StyleSheet.create({
+  marginTop: Platform.OS === "android" ? 35 : 1,
+});
 
 export default function App() {
   const [insulinData, setInsulinData] = useState("");
@@ -22,8 +28,8 @@ export default function App() {
     return moment().add(3, "days").format("dddd, Do MMMM , HH:mm");
   };
 
-  const addFiftheenDays = () => {
-    return moment().add(15, "days").format("dddd, Do MMMM , HH:mm");
+  const addTenDays = () => {
+    return moment().add(10, "days").format("dddd, Do MMMM , HH:mm");
   };
 
   const saveInsulinData = async (insulinDatum) => {
@@ -107,15 +113,15 @@ export default function App() {
     saveNeedleData(_needledate);
   };
   const onPressSensor = () => {
-    const _sensordate = addFiftheenDays();
+    const _sensordate = addTenDays();
     setSensorData(_sensordate);
     saveSensorData(_sensordate);
   };
 
   return (
     <SafeAreaView className="bg-fuchsia-200" style={{ flex: 1 }}>
-      <View className="flex-1 justify-between">
-        <View className="m-2 flex-1 items-center justify-center bg-[#313866]">
+      <View className="flex-1 justify-between" style={styles}>
+        <View className="m-2 flex-1 items-center justify-center bg-[#313866] rounded-xl">
           <TouchableOpacity
             className="w-24 h-24  bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressInsulin(moment.now())}
@@ -127,7 +133,7 @@ export default function App() {
           </Text>
         </View>
 
-        <View className="m-2 flex-1 items-center justify-center  bg-[#504099]">
+        <View className="m-2 flex-1 items-center justify-center  bg-[#504099] rounded-xl">
           <TouchableOpacity
             className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressSensor(moment.now())}
@@ -139,7 +145,7 @@ export default function App() {
           </Text>
         </View>
 
-        <View className="m-2 flex-1 items-center justify-center bg-[#974EC3]">
+        <View className="m-2 flex-1 items-center justify-center bg-[#974EC3] rounded-xl">
           <TouchableOpacity
             className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressNeedle(moment.now())}
@@ -160,6 +166,7 @@ export default function App() {
           </TouchableOpacity>
         </View>
       </View>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 }
