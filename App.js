@@ -4,7 +4,6 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   Platform,
   StyleSheet,
 } from "react-native";
@@ -18,9 +17,9 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
-  const [insulinData, setInsulinData] = useState("");
-  const [needleData, setNeedleData] = useState("");
-  const [sensorData, setSensorData] = useState("");
+  const [insulinData, setInsulinData] = useState("Ingen datum registrerad");
+  const [needleData, setNeedleData] = useState("Ingen datum registrerad");
+  const [sensorData, setSensorData] = useState("Ingen datum registrerad");
 
   moment.locale("sv");
 
@@ -34,7 +33,6 @@ export default function App() {
 
   const saveInsulinData = async (insulinDatum) => {
     try {
-      console.log(insulinDatum);
       await AsyncStorage.setItem("insulin", insulinDatum);
     } catch (error) {
       alert(error);
@@ -69,8 +67,6 @@ export default function App() {
     setInsulinData("Ingen datum registrerad");
     setSensorData("Ingen datum registrerad");
     setNeedleData("Ingen datum registrerad");
-
-    console.log("Done");
   };
 
   const fetchInsulinData = async () => {
@@ -78,10 +74,6 @@ export default function App() {
       const value1 = await AsyncStorage.getItem("insulin");
       const value2 = await AsyncStorage.getItem("needle");
       const value3 = await AsyncStorage.getItem("sensor");
-
-      console.log("denaa", value1, value2, value3);
-
-      console.log("staten", insulinData, sensorData, needleData);
 
       if (value1 != null) {
         setInsulinData(value1);
