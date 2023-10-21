@@ -4,22 +4,54 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  Platform,
-  StyleSheet,
+  Button,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import "moment/locale/sv";
+import { Link } from "expo-router";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-const styles = StyleSheet.create({
-  marginTop: Platform.OS === "android" ? 35 : 1,
-});
+export default function index() {
+  const [insulinData, setInsulinData] = useState("Inget datum registrerat");
+  const [needleData, setNeedleData] = useState("Inget datum registrerat");
+  const [sensorData, setSensorData] = useState("Inget datum registrerat");
 
-export default function App() {
-  const [insulinData, setInsulinData] = useState("Ingen datum registrerad");
-  const [needleData, setNeedleData] = useState("Ingen datum registrerad");
-  const [sensorData, setSensorData] = useState("Ingen datum registrerad");
+  const [date, setDate] = useState(new Date(1598051730000));
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
+
+  const onChangeInsulin = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const onChangeSensor = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const onChangeNeel = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
+
+  const showTimepicker = () => {
+    showMode("time");
+  };
 
   moment.locale("sv");
 
@@ -64,9 +96,9 @@ export default function App() {
       // remove error
     }
 
-    setInsulinData("Ingen datum registrerad");
-    setSensorData("Ingen datum registrerad");
-    setNeedleData("Ingen datum registrerad");
+    setInsulinData("Inget datum registrerat");
+    setSensorData("Inget datum registrerat");
+    setNeedleData("Inget datum registrerat");
   };
 
   const fetchInsulinData = async () => {
@@ -111,23 +143,48 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView className="bg-fuchsia-200" style={{ flex: 1 }}>
-      <View className="flex-1 justify-between" style={styles}>
+    <SafeAreaView className="bg-fuchsia-200  flex-1 pt-2 pr-2 pl-2">
+      <View>
+        {show && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={date}
+            mode={mode}
+            is24Hour={true}
+            onChange={onChangeInsulin}
+          />
+        )}
+      </View>
+      <View className="flex-1 justify-between">
         <View className="m-2 flex-1 items-center justify-center bg-[#313866] rounded-xl">
-          <TouchableOpacity
-            className="w-24 h-24  bg-[#FE7BE5] rounded-full items-center justify-center"
-            onPress={() => onPressInsulin(moment.now())}
-          >
-            <Text className="text-white text-lg font-bold">Insulin</Text>
-          </TouchableOpacity>
-          <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
-            {insulinData}
-          </Text>
+          <View className="mt-4 flex flex-row justify-evenly w-full">
+            <View>
+              <TouchableOpacity
+                className=" bg-[#FE7BE5] rounded-full h-20 w-20  items-center justify-center"
+                onPress={() => onPressInsulin(moment.now())}
+              >
+                <Text className="text-white text-lg font-bold">Insulin</Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <TouchableOpacity
+                className="bg-fuchsia-300 rounded-full h-20 w-20  items-center justify-center"
+                onPress={() => showDatepicker()}
+              >
+                <Text className="text-white text-lg font-bold">Justera</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="m-2">
+            <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
+              {insulinData}
+            </Text>
+          </View>
         </View>
 
         <View className="m-2 flex-1 items-center justify-center  bg-[#504099] rounded-xl">
           <TouchableOpacity
-            className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
+            className=" bg-[#FE7BE5] rounded-full h-20 w-20  items-center justify-center"
             onPress={() => onPressSensor(moment.now())}
           >
             <Text className="text-white text-lg font-bold">Sensor</Text>
@@ -139,7 +196,7 @@ export default function App() {
 
         <View className="m-2 flex-1 items-center justify-center bg-[#974EC3] rounded-xl">
           <TouchableOpacity
-            className="w-24 h-24 bg-[#FE7BE5] rounded-full items-center justify-center"
+            className="w-20 h-20 bg-[#FE7BE5] rounded-full items-center justify-center"
             onPress={() => onPressNeedle(moment.now())}
           >
             <Text className="text-white text-lg font-bold">Nål</Text>
@@ -156,6 +213,7 @@ export default function App() {
           >
             <Text className="text-white text-sm font-bold">Rensa</Text>
           </TouchableOpacity>
+          <Link href="/home">About</Link>
         </View>
       </View>
       <StatusBar style="light" />
