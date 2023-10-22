@@ -260,32 +260,6 @@ export default function index() {
           </View>
         </View>
 
-        <View className="m-2 flex-1 items-center justify-center  bg-[#504099] rounded-xl">
-          <View className="mt-4 flex flex-row justify-evenly w-full">
-            <View>
-              <TouchableOpacity
-                className=" bg-[#FE7BE5] rounded-full h-20 w-20  items-center justify-center"
-                onPress={() => onPressSensor(moment.now())}
-              >
-                <Text className="text-white text-lg font-bold">Sensor</Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              <TouchableOpacity
-                className=" bg-[#7d67e0] rounded-full h-20 w-20  items-center justify-center"
-                onPress={() => showDatepicker(1)}
-              >
-                <Text className="text-white text-lg font-bold">Justera</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View className="m-2">
-            <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
-              {sensorData}
-            </Text>
-          </View>
-        </View>
-
         <View className="m-2 flex-1 items-center justify-center bg-[#974EC3] rounded-xl">
           <View className="mt-4 flex flex-row justify-evenly w-full">
             <View>
@@ -308,6 +282,32 @@ export default function index() {
           <View className="m-2">
             <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
               {needleData}
+            </Text>
+          </View>
+        </View>
+
+        <View className="m-2 flex-1 items-center justify-center  bg-[#504099] rounded-xl">
+          <View className="mt-4 flex flex-row justify-evenly w-full">
+            <View>
+              <TouchableOpacity
+                className=" bg-[#FE7BE5] rounded-full h-20 w-20  items-center justify-center"
+                onPress={() => onPressSensor(moment.now())}
+              >
+                <Text className="text-white text-lg font-bold">Sensor</Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <TouchableOpacity
+                className=" bg-[#7d67e0] rounded-full h-20 w-20  items-center justify-center"
+                onPress={() => showDatepicker(1)}
+              >
+                <Text className="text-white text-lg font-bold">Justera</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="m-2">
+            <Text className="text-center text-white mt-2 font-bold text-xl pt-2">
+              {sensorData}
             </Text>
           </View>
         </View>
