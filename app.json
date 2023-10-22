@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Tilda",
-    "slug": "Tilda",
+    "name": "Singelvisa",
+    "slug": "Singelvisa",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon_singelvisa.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash_singelvisa.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#d9a3ff"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
