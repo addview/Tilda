@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash_singelvisa.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#d9a3ff"
     },
     "assetBundlePatterns": ["**/*"],
