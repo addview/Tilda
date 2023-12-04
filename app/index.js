@@ -13,6 +13,47 @@ import "moment/locale/sv";
 import { Link } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+import { initializeApp } from "firebase/app";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+
+// Optionally import the services that you want to use
+// import {...} from "firebase/auth";
+// import {...} from "firebase/database";
+// import {...} from "firebase/firestore";
+// import {...} from "firebase/functions";
+// import {...} from "firebase/storage";
+
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBopr6LO-8qhIfm2oUeTxcgKo_B33LnNUg",
+  authDomain: "singelvisa.firebaseapp.com",
+  projectId: "singelvisa",
+  storageBucket: "singelvisa.appspot.com",
+  messagingSenderId: "947224097736",
+  appId: "1:947224097736:web:728d0d28323a859319c6fd",
+};
+
+const app = initializeApp(firebaseConfig);
+// For more information on how to access Firebase in your project,
+// see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+
+const fetchChanges = async (userId) => {
+  const changes = [];
+
+  const querySnapshot = await getDocs(collection(db, "changes"));
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let res = doc.data();
+    //cconsole.log(doc.id, " => ", doc.data());
+    console.log(res);
+  });
+
+  return changes;
+};
+
 export default function index() {
   const [insulinData, setInsulinData] = useState("Inget datum registrerat");
   const [needleData, setNeedleData] = useState("Inget datum registrerat");
@@ -171,6 +212,8 @@ export default function index() {
     setShowInsulinDateTime(false);
     setInsulinData(_insulindate);
     saveInsulinData(_insulindate);
+    const res = fetchChanges("tuxs3L8OjXlMk1kimdWI");
+    console.log(res);
   };
   const onPressNeedle = () => {
     const _needledate = addThreeDays();
