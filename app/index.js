@@ -43,6 +43,7 @@ export default function index() {
     let dateTimeStr = _insulinDate;
     let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
     setInsulinData(updatedDateTimeStr);
+    saveInsulinData(updatedDateTimeStr);
   };
 
   const onChangeSensor = (event, selectedDate) => {
@@ -53,6 +54,7 @@ export default function index() {
     let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
 
     setSensorData(updatedDateTimeStr);
+    saveSensorData(updatedDateTimeStr);
   };
 
   const onChangeNeel = (event, selectedDate) => {
@@ -63,6 +65,7 @@ export default function index() {
     let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
 
     setNeedleData(updatedDateTimeStr);
+    saveNeedleData(updatedDateTimeStr);
   };
 
   const showMode = (currentMode, index) => {
@@ -100,6 +103,7 @@ export default function index() {
   };
 
   const saveInsulinData = async (insulinDatum) => {
+    console.log("set insulin", insulinDatum);
     try {
       await AsyncStorage.setItem("insulin", insulinDatum);
     } catch (error) {

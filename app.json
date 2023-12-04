@@ -4,7 +4,7 @@
     "slug": "Tilda",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon_singelvisa.png",
+    "icon": "./assets/iconuse.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
