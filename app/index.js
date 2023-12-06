@@ -1,27 +1,20 @@
 import { useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  Button,
-} from "react-native";
+import { Text, View, SafeAreaView, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import "moment/locale/sv";
-import { Link } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
 import { initializeApp } from "firebase/app";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
-
-// Optionally import the services that you want to use
-// import {...} from "firebase/auth";
-// import {...} from "firebase/database";
-// import {...} from "firebase/firestore";
-// import {...} from "firebase/functions";
-// import {...} from "firebase/storage";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -40,34 +33,46 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-const fetchChanges = async (userId) => {
-  const changes = [];
-
-  const querySnapshot = await getDocs(collection(db, "changes"));
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    let res = doc.data();
-    //cconsole.log(doc.id, " => ", doc.data());
-    console.log(res);
-  });
-
-  return changes;
-};
-
 export default function index() {
-  const [insulinData, setInsulinData] = useState("Inget datum registrerat");
-  const [needleData, setNeedleData] = useState("Inget datum registrerat");
-  const [sensorData, setSensorData] = useState("Inget datum registrerat");
-
+  const tyraUserID = "tuxs3L8OjXlMk1kimdWI";
+  const loadingMessage = "..hämtar data";
+  const [insulinData, setInsulinData] = useState(loadingMessage);
+  const [needleData, setNeedleData] = useState(loadingMessage);
+  const [sensorData, setSensorData] = useState(loadingMessage);
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [showInsulinDateTime, setShowInsulinDateTime] = useState(false);
-
-  //const [date, setDate] = useState(new Date(1598051730000));
   const [showSensorDateTime, setShowSensorDateTime] = useState(false);
-
-  //const [date, setDate] = useState(new Date(1598051730000));
   const [showNeelDateTime, setShowNeelDateTime] = useState(false);
+
+  const listLatestChange = async (userid, changeType) => {
+    const q = query(
+      collection(db, "changes"),
+      where("changeType", "==", changeType),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      console.log("Inga poster hittades för", changeType);
+      return null;
+    }
+    const latestDoc = querySnapshot.docs[0];
+    return latestDoc.data();
+  };
+
+  const addChanges = async (userId, changeType, date) => {
+    let fixDate = moment(date, "dddd, Do MMMM , HH:mm").format("L");
+    let fixTime = moment(date, "dddd, Do MMMM , HH:mm").format("LT");
+    const docRef = await addDoc(collection(db, "changes"), {
+      changeType: changeType,
+      dateChanged: fixDate,
+      timeChanged: fixTime,
+      timestamp: moment().valueOf(),
+      userId: userId,
+    });
+  };
 
   function changeTimeToNoon(inputStr) {
     // Använd en regex för att matcha klockslag (HH:MM format)
@@ -93,7 +98,6 @@ export default function index() {
 
     let dateTimeStr = _sensorDate;
     let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
-
     setSensorData(updatedDateTimeStr);
     saveSensorData(updatedDateTimeStr);
   };
@@ -104,7 +108,6 @@ export default function index() {
 
     let dateTimeStr = _neelDate;
     let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
-
     setNeedleData(updatedDateTimeStr);
     saveNeedleData(updatedDateTimeStr);
   };
@@ -121,7 +124,6 @@ export default function index() {
       setShowNeelDateTime(true);
     }
 
-    //setShow(true);
     setMode(currentMode);
   };
 
@@ -132,11 +134,7 @@ export default function index() {
   moment.locale("sv");
 
   const addThreeDays = (date) => {
-    //if (date != null) {
-    const newDate = moment(date).add(3, "days").format("dddd, Do MMMM , HH:mm");
     return moment(date).add(3, "days").format("dddd, Do MMMM , HH:mm");
-    //}
-    //return moment().add(3, "days").format("dddd, Do MMMM , HH:mm");
   };
 
   const addTenDays = (date) => {
@@ -144,85 +142,56 @@ export default function index() {
   };
 
   const saveInsulinData = async (insulinDatum) => {
-    console.log("set insulin", insulinDatum);
-    try {
-      await AsyncStorage.setItem("insulin", insulinDatum);
-    } catch (error) {
-      alert(error);
-      alert("Fel vid sparande av data.");
-    }
+    addChanges(tyraUserID, "Insulin", insulinDatum);
   };
 
   const saveNeedleData = async (needleDatum) => {
-    try {
-      await AsyncStorage.setItem("needle", needleDatum);
-    } catch (error) {
-      alert("Fel vid sparande av data.");
-    }
+    addChanges(tyraUserID, "Needle", needleDatum);
   };
 
   const saveSensorData = async (sensorDatum) => {
-    try {
-      await AsyncStorage.setItem("sensor", sensorDatum);
-    } catch (error) {
-      alert("Fel vid sparande av data.");
-    }
+    addChanges(tyraUserID, "Sensor", sensorDatum);
   };
 
-  removeFew = async () => {
-    const keys = ["insulin", "needle", "sensor"];
+  const fetchData = async () => {
     try {
-      await AsyncStorage.multiRemove(keys);
-    } catch (e) {
-      // remove error
-    }
+      listLatestChange(tyraUserID, "Needle").then((data) => {
+        let dateFix = data.dateChanged + " " + data.timeChanged;
+        setNeedleData(moment(dateFix).format("dddd, Do MMMM , HH:mm"));
+      });
 
-    setInsulinData("Inget datum registrerat");
-    setSensorData("Inget datum registrerat");
-    setNeedleData("Inget datum registrerat");
-  };
+      listLatestChange(tyraUserID, "Sensor").then((data) => {
+        let dateFix = data.dateChanged + " " + data.timeChanged;
+        setSensorData(moment(dateFix).format("dddd, Do MMMM , HH:mm"));
+      });
 
-  const fetchInsulinData = async () => {
-    try {
-      const value1 = await AsyncStorage.getItem("insulin");
-      const value2 = await AsyncStorage.getItem("needle");
-      const value3 = await AsyncStorage.getItem("sensor");
-
-      if (value1 != null) {
-        setInsulinData(value1);
-      }
-      if (value2 != null) {
-        setNeedleData(value2);
-      }
-      if (value3 != null) {
-        setSensorData(value3);
-      }
+      listLatestChange(tyraUserID, "Insulin").then((data) => {
+        let dateFix = data.dateChanged + " " + data.timeChanged;
+        setInsulinData(moment(dateFix).format("dddd, Do MMMM , HH:mm"));
+      });
     } catch (error) {
       alert("Fel vid hämtning av data.");
     }
   };
 
   useEffect(() => {
-    fetchInsulinData();
+    fetchData();
   }, []);
 
-  const onPressInsulin = () => {
-    const _insulindate = addThreeDays();
-    console.log(_insulindate);
+  const onPressInsulin = (date) => {
+    const _insulindate = addThreeDays(date);
     setShowInsulinDateTime(false);
     setInsulinData(_insulindate);
     saveInsulinData(_insulindate);
-    const res = fetchChanges("tuxs3L8OjXlMk1kimdWI");
-    console.log(res);
   };
-  const onPressNeedle = () => {
-    const _needledate = addThreeDays();
+  const onPressNeedle = (date) => {
+    const _needledate = addThreeDays(date);
     setShowNeelDateTime(false);
     setNeedleData(_needledate);
     saveNeedleData(_needledate);
   };
-  const onPressSensor = () => {
-    const _sensordate = addTenDays();
+  const onPressSensor = (date) => {
+    const _sensordate = addTenDays(date);
     setShowSensorDateTime(false);
     setSensorData(_sensordate);
     saveSensorData(_sensordate);
@@ -357,15 +326,6 @@ export default function index() {
               {sensorData}
             </Text>
           </View>
-        </View>
-
-        <View className="m-2 p-2  items-center justify-center ">
-          <TouchableOpacity
-            className="w-16 h-16 bg-[#c32da7] rounded-full items-center justify-center"
-            onPress={() => removeFew()}
-          >
-            <Text className="text-white text-sm font-bold">Rensa</Text>
-          </TouchableOpacity>
         </View>
       </View>
       <StatusBar style="light" />
