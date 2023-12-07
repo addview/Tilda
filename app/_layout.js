@@ -12,7 +12,7 @@ export default function Layout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerShown: true,
+        headerShown: false,
         presentation: "fullScreenModal",
       }}
     >
