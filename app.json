@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash_singelvisa.png",
       "resizeMode": "cover",
-      "backgroundColor": "#d9a3ff"
+      "backgroundColor": "#000"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {

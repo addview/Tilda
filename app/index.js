@@ -41,11 +41,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const index = () => {
-  useEffect(() => {
-    fetchData();
-    getUserIntervall("tyra@slowmotion.se");
-  }, []);
-
   const ios = 115;
   const android = 100;
   const iosH = 215;
@@ -69,6 +64,23 @@ const index = () => {
   const [isNeedleDataAfter, setIsNeedleDataAfter] = useState(false);
   const [isInsulinDataAfter, setIsInsulinDataAfter] = useState(false);
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+    getUserIntervall("tyra@slowmotion.se");
+  }, []);
+
+  useEffect(() => {
+    if (needleData) {
+      setIsNeedleDataAfter(isDataAfter(needleData));
+    }
+    if (insulinData) {
+      setIsInsulinDataAfter(isDataAfter(insulinData));
+    }
+    if (sensorData) {
+      setIsSensorDataAfter(isDataAfter(sensorData));
+    }
+  }, [needleData, insulinData, sensorData]);
 
   const getUserIntervall = async (email) => {
     const q = query(
@@ -165,7 +177,6 @@ const index = () => {
   };
 
   const showMode = (currentMode, index) => {
-    console.log("index", index);
     if (index === 0) {
       setShowInsulinDateTime(true);
     }
@@ -214,18 +225,6 @@ const index = () => {
       return false;
     }
   };
-
-  useEffect(() => {
-    if (needleData) {
-      setIsNeedleDataAfter(isDataAfter(needleData));
-    }
-    if (insulinData) {
-      setIsInsulinDataAfter(isDataAfter(insulinData));
-    }
-    if (sensorData) {
-      setIsSensorDataAfter(isDataAfter(sensorData));
-    }
-  }, [needleData, insulinData, sensorData]);
 
   const fetchData = async () => {
     try {
