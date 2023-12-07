@@ -386,7 +386,7 @@ const index = () => {
                     color: isInsulinDataAfter ? "red" : "white",
                   }}
                 >
-                  {insulinData}
+                  {insulinData === null ? loadingMessage : insulinData}
                 </Text>
               </View>
             </View>
@@ -435,7 +435,7 @@ const index = () => {
                     color: isNeedleDataAfter ? "red" : "white",
                   }}
                 >
-                  {needleData}
+                  {needleData === null ? loadingMessage : needleData}
                 </Text>
               </View>
             </View>
@@ -486,7 +486,7 @@ const index = () => {
                     color: isSensorDataAfter ? "red" : "white",
                   }}
                 >
-                  {sensorData}
+                  {sensorData === null ? loadingMessage : sensorData}
                 </Text>
               </View>
             </View>
