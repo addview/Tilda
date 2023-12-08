@@ -1,8 +1,19 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEffect, useState } from "react";
-import { Text, View, TouchableOpacity, Platform } from "react-native";
-import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Platform,
+  Pressable,
+} from "react-native";
+import {
+  Ionicons,
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome,
+} from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import moment from "moment";
 import "moment/locale/sv";
@@ -18,6 +29,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+import { Link } from "expo-router";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -278,9 +290,9 @@ const index = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-gray-100">
+    <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-[#74cdcd]">
       {showInsulinDateTime && (
-        <View className="m-2 items-center justify-center bg-[#EC9A29] rounded-xl">
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -328,17 +340,24 @@ const index = () => {
           </View>
         </View>
       )}
-      <View
-        style={{ flex: 1 }}
-        className="justify-center items-center flex-row gap-2"
-      >
-        <Text className="text-2xl font-bold text-[#143642]">
-          Singelvisa Tidsstämpling
-        </Text>
-
-        <TouchableOpacity onPress={() => fetchData()}>
-          <Ionicons name="reload" size={40} color="#20696a" />
-        </TouchableOpacity>
+      <View className="flex-row p-1">
+        <View>
+          <Link href="/(modals)/modal" asChild>
+            <Pressable>
+              {({ pressed }) => (
+                <Ionicons name="settings-outline" size={30} color="white" />
+              )}
+            </Pressable>
+          </Link>
+        </View>
+        <View className="grow items-center ">
+          <Text className="text-2xl font-bold text-white">Singelvisa</Text>
+        </View>
+        <View className="flex-none mr-1">
+          <TouchableOpacity onPress={() => fetchData()}>
+            <Ionicons name="reload" size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
         <View style={{ flex: 2 }}>
