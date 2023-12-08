@@ -1,8 +1,12 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { useEffect, useState } from "react";
-import { Text, View, TouchableOpacity, Platform } from "react-native";
-import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import moment from "moment";
 import "moment/locale/sv";
@@ -36,9 +40,9 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-const index = () => {
-  const ios = "20%";
-  const android = "90%";
+const rr = () => {
+  const ios = 115;
+  const android = 100;
   const iosH = 215;
   const androidH = 185;
 
@@ -278,7 +282,7 @@ const index = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-gray-100">
+    <SafeAreaView className="flex-1 pt-6 bg-[#C8BCC6] ">
       {showInsulinDateTime && (
         <View className="m-2 items-center justify-center bg-[#EC9A29] rounded-xl">
           <View>
@@ -328,104 +332,176 @@ const index = () => {
           </View>
         </View>
       )}
-      <View
-        style={{ flex: 1 }}
-        className="justify-center items-center flex-row gap-2"
-      >
-        <Text className="text-2xl font-bold text-[#143642]">
-          Singelvisa Tidsstämpling
-        </Text>
-
-        <TouchableOpacity onPress={() => fetchData()}>
-          <Ionicons name="reload" size={40} color="#20696a" />
-        </TouchableOpacity>
-      </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
-              >
-                <Entypo name="water" size={24} color="white" />
-                <Text className="text-xl font-normal text-white">Insulin</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
+      <View className="p-2">
+        <View className="flex-row mb-3 h-8 justify-center">
+          <Text className="font-extrabold text-2xl text-[#143642]">
+            Tidsstämpling
           </Text>
         </View>
-      </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]   p-4 rounded-xl"
-              >
-                <MaterialCommunityIcons name="needle" size={40} color="white" />
-                <Text className="text-xl font-normal text-white">Nål</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
+        <View className="flex-1 flex-col gap-2">
+          <View
+            style={{
+              height: Platform.OS === "ios" ? iosH : androidH,
+            }}
+            className="bg-[#143642]  rounded-lg "
+          >
+            <View className="flex-1 flex-col gap-4 items-center justify-center">
+              <View>
+                <View className="flex-row gap-16">
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => onPressInsulin(moment.now())}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">
+                        Insulin
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => showDatepicker(0)}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">
+                        Justera
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+              <View>
+                <Text
+                  className="text-xl font-bold"
+                  style={{
+                    color: isInsulinDataAfter ? "red" : "white",
+                  }}
+                >
+                  {insulinData === null ? loadingMessage : insulinData}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
-          </Text>
-        </View>
-      </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
-              >
-                <Ionicons name="wifi" size={40} color="white" />
-                <Text className="text-xl font-normal text-white">Sensor</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
+          <View
+            style={{
+              height: Platform.OS === "ios" ? iosH : androidH,
+            }}
+            className="bg-[#143642]  rounded-lg"
+          >
+            <View className="flex-1 flex-col gap-4 items-center justify-center">
+              <View>
+                <View className="flex-row gap-16">
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => onPressNeedle(moment.now())}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full  items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">Nål</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => showDatepicker(2)}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">
+                        Justera
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+              <View>
+                <Text
+                  className="text-xl font-bold text-white"
+                  style={{
+                    color: isNeedleDataAfter ? "red" : "white",
+                  }}
+                >
+                  {needleData === null ? loadingMessage : needleData}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
-          </Text>
+          <View
+            style={{
+              height: Platform.OS === "ios" ? iosH : androidH,
+            }}
+            className="bg-[#143642]  rounded-lg "
+          >
+            <View className="flex-1 flex-col gap-4 items-center justify-center">
+              <View>
+                <View className="flex-row gap-16">
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => onPressSensor(moment.now())}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full  items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">
+                        Sensor
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => showDatepicker(1)}
+                      style={{
+                        height: Platform.OS === "ios" ? ios : android,
+                        width: Platform.OS === "ios" ? ios : android,
+                      }}
+                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
+                    >
+                      <Text className="text-white text-2xl font-bold">
+                        Justera
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+              <View>
+                <Text
+                  className="text-xl font-bold"
+                  style={{
+                    color: isSensorDataAfter ? "red" : "white",
+                  }}
+                >
+                  {sensorData === null ? loadingMessage : sensorData}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View className="m-2 p-2  items-center justify-center ">
+            <TouchableOpacity
+              className="w-16 h-16 bg-[#EC9A29] rounded-full items-center justify-center"
+              onPress={() => fetchData()}
+            >
+              <Ionicons name="reload" size={40} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </SafeAreaView>
   );
 };
 
-export default index;
+export default rr;
