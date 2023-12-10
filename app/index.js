@@ -187,12 +187,18 @@ const index = () => {
   const showMode = (currentMode, index) => {
     if (index === 0) {
       setShowInsulinDateTime(true);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
     }
     if (index === 1) {
       setShowSensorDateTime(true);
+      setShowNeelDateTime(false);
+      setShowInsulinDateTime(false);
     }
     if (index === 2) {
       setShowNeelDateTime(true);
+      setShowSensorDateTime(false);
+      setShowInsulinDateTime(false);
     }
 
     setMode(currentMode);
@@ -235,6 +241,9 @@ const index = () => {
   };
 
   const fetchData = async () => {
+    setShowInsulinDateTime(false);
+    setShowSensorDateTime(false);
+    setShowNeelDateTime(false);
     try {
       const [needleDataResponse, sensorDataResponse, insulinDataResponse] =
         await Promise.all([
@@ -292,7 +301,7 @@ const index = () => {
   return (
     <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-[#74cdcd]">
       {showInsulinDateTime && (
-        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
+        <View className="items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -301,7 +310,7 @@ const index = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeInsulin}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
                 size="20"
               />
             </View>
@@ -309,7 +318,7 @@ const index = () => {
         </View>
       )}
       {showSensorDateTime && (
-        <View className="m-2 items-center justify-center bg-[#d9a3ff] rounded-xl">
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -318,14 +327,14 @@ const index = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeSensor}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
               />
             </View>
           </View>
         </View>
       )}
       {showNeelDateTime && (
-        <View className="m-2 items-center justify-center bg-[#d9a3ff] rounded-xl">
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -334,7 +343,7 @@ const index = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeNeel}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
               />
             </View>
           </View>
@@ -364,6 +373,7 @@ const index = () => {
           <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={{ flex: 3 }} className="justify-center items-center">
               <TouchableOpacity
+                onPress={() => onPressInsulin(moment.now())}
                 style={{ width: 100, height: 100 }}
                 className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
               >
@@ -372,7 +382,10 @@ const index = () => {
               </TouchableOpacity>
             </View>
             <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
+              <TouchableOpacity
+                onPress={() => showDatepicker(0)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
                 <Text className="text-xl font-normal text-white">Justera</Text>
               </TouchableOpacity>
             </View>
@@ -382,8 +395,13 @@ const index = () => {
           style={{ flex: 1 }}
           className="items-center justify-center bg-[#eda034]"
         >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
+          <Text
+            className="text-xl font-bold"
+            style={{
+              color: isInsulinDataAfter ? "red" : "black",
+            }}
+          >
+            {insulinData === null ? loadingMessage : insulinData}
           </Text>
         </View>
       </View>
@@ -392,6 +410,7 @@ const index = () => {
           <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={{ flex: 3 }} className="justify-center items-center">
               <TouchableOpacity
+                onPress={() => onPressNeedle(moment.now())}
                 style={{ width: 100, height: 100 }}
                 className="items-center justify-center bg-[#0F8B8D]   p-4 rounded-xl"
               >
@@ -400,7 +419,10 @@ const index = () => {
               </TouchableOpacity>
             </View>
             <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
+              <TouchableOpacity
+                onPress={() => showDatepicker(2)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
                 <Text className="text-xl font-normal text-white">Justera</Text>
               </TouchableOpacity>
             </View>
@@ -410,8 +432,13 @@ const index = () => {
           style={{ flex: 1 }}
           className="items-center justify-center bg-[#eda034]"
         >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
+          <Text
+            className="text-xl font-bold text-white"
+            style={{
+              color: isNeedleDataAfter ? "red" : "black",
+            }}
+          >
+            {needleData === null ? loadingMessage : needleData}
           </Text>
         </View>
       </View>
@@ -420,6 +447,7 @@ const index = () => {
           <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={{ flex: 3 }} className="justify-center items-center">
               <TouchableOpacity
+                onPress={() => onPressSensor(moment.now())}
                 style={{ width: 100, height: 100 }}
                 className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
               >
@@ -428,7 +456,10 @@ const index = () => {
               </TouchableOpacity>
             </View>
             <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity className="items-center justify-center bg-[#20696a] p-4 rounded-xl">
+              <TouchableOpacity
+                onPress={() => showDatepicker(1)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
                 <Text className="text-xl font-normal text-white">Justera</Text>
               </TouchableOpacity>
             </View>
@@ -438,8 +469,13 @@ const index = () => {
           style={{ flex: 1 }}
           className="items-center justify-center bg-[#eda034]"
         >
-          <Text className="text-xl font-bold text-black">
-            Byta - fredag, 8:e december, 12:00
+          <Text
+            className="text-xl font-bold"
+            style={{
+              color: isSensorDataAfter ? "red" : "black",
+            }}
+          >
+            {sensorData === null ? loadingMessage : sensorData}
           </Text>
         </View>
       </View>
