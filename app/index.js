@@ -8,12 +8,7 @@ import {
   Platform,
   Pressable,
 } from "react-native";
-import {
-  Ionicons,
-  Entypo,
-  MaterialCommunityIcons,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import moment from "moment";
 import "moment/locale/sv";
