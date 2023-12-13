@@ -1,23 +1,10 @@
-import { Stack } from "expo-router";
+import { Stack, Redirect, Slot, SplashScreen } from "expo-router";
+import { SessionProvider } from "../context/Ctx";
 
 export default function Layout() {
   return (
-    <Stack
-      // https://reactnavigation.org/docs/headers#sharing-common-options-across-screens
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: "#974EC3",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-        headerShown: false,
-        presentation: "fullScreenModal",
-      }}
-    >
-      {/* Optionally configure static options outside the route. */}
-      <Stack.Screen name="index" options={{ title: "Registrering" }} />
-    </Stack>
+    <SessionProvider>
+      <Slot />
+    </SessionProvider>
   );
 }

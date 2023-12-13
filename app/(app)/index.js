@@ -1,51 +1,39 @@
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useSession } from "../../context/Ctx";
 import { useEffect, useState } from "react";
 import {
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   Platform,
+  Pressable,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import moment from "moment";
 import "moment/locale/sv";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { initializeApp } from "firebase/app";
 import {
   collection,
   getDocs,
-  getFirestore,
   addDoc,
   query,
   where,
   orderBy,
   limit,
 } from "firebase/firestore";
+import { Link } from "expo-router";
+import { FIREBASE_DB } from "../../firebaseConfig";
 
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBopr6LO-8qhIfm2oUeTxcgKo_B33LnNUg",
-  authDomain: "singelvisa.firebaseapp.com",
-  projectId: "singelvisa",
-  storageBucket: "singelvisa.appspot.com",
-  messagingSenderId: "947224097736",
-  appId: "1:947224097736:web:728d0d28323a859319c6fd",
-};
+const db = FIREBASE_DB;
 
-const app = initializeApp(firebaseConfig);
-// For more information on how to access Firebase in your project,
-// see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
-
-const rr = () => {
-  const ios = 115;
-  const android = 100;
+const index = () => {
+  const ios = "20%";
+  const android = "90%";
   const iosH = 215;
   const androidH = 185;
 
+  const { session, signOut, isLoading } = useSession();
   const tyraUserID = "tuxs3L8OjXlMk1kimdWI";
   const loadingMessage = "..hämtar data";
   const [insulinData, setInsulinData] = useState(null);
@@ -64,11 +52,22 @@ const rr = () => {
   const [isNeedleDataAfter, setIsNeedleDataAfter] = useState(false);
   const [isInsulinDataAfter, setIsInsulinDataAfter] = useState(false);
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
+  const [uniqueDokumentId, setUniqueDokumentId] = useState(null);
 
   useEffect(() => {
-    fetchData();
-    getUserIntervall("tyra@slowmotion.se");
-  }, []);
+    const executeAsyncFunctions = async () => {
+      try {
+        await getUserByEmail(session); // Väntar på att denna funktion ska slutföras
+      } catch (error) {
+        console.error(
+          "Ett fel uppstod under körning av asynkrona funktioner",
+          error
+        );
+      }
+    };
+
+    executeAsyncFunctions();
+  }, [session]);
 
   useEffect(() => {
     if (needleData) {
@@ -82,23 +81,54 @@ const rr = () => {
     }
   }, [needleData, insulinData, sensorData]);
 
+  // En separat useEffect för att logga state när den ändras
+  useEffect(() => {
+    fetchData(); // Därefter körs denna
+    getUserIntervall(session); // Och sist denna
+  }, [uniqueDokumentId]);
+
+  const getUserByEmail = async (session) => {
+    console.log("längd", session.length);
+    const q = query(
+      collection(db, "users"),
+      where("email", "==", session),
+      limit(1)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      console.log("Inga poster hittades för", session);
+      alert("Inga poster hittades för " + session);
+      return null;
+    }
+    const userDoc = querySnapshot.docs[0];
+    setUniqueDokumentId(userDoc.id);
+    return userDoc.data();
+  };
+
   const getUserIntervall = async (email) => {
     const q = query(
       collection(db, "users"),
-      where("email", "==", email),
+      where("email", "==", "tyra@slowmotion.se"),
       limit(1)
     );
 
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
       console.log("Inga poster hittades för", email);
+      alert("Inga poster hittades för", email);
+      setIntervalDataInsulin(null);
+      setIntervalDataNeedle(null);
+      setIntervalDataSensor(null);
+      setInsulinData(null);
+      setNeedleData(null);
+      setSensorData(null);
       return null;
     }
     const latestDoc = querySnapshot.docs[0];
     setIntervalDataInsulin(latestDoc.data().insulin);
     setIntervalDataNeedle(latestDoc.data().needle);
     setIntervalDataSensor(latestDoc.data().sensor);
-
     return latestDoc.data();
   };
 
@@ -106,7 +136,7 @@ const rr = () => {
     const q = query(
       collection(db, "changes"),
       where("changeType", "==", changeType),
-      where("userId", "==", tyraUserID),
+      where("userId", "==", uniqueDokumentId),
       orderBy("timestamp", "desc"),
       limit(1)
     );
@@ -121,6 +151,8 @@ const rr = () => {
   };
 
   const addChanges = async (userId, changeType, date) => {
+    console.log("add", userId);
+
     let fixDate = moment(date, "dddd, Do MMMM , HH:mm").format("L");
     let fixTime = moment(date, "dddd, Do MMMM , HH:mm").format("LT");
     const docRef = await addDoc(collection(db, "changes"), {
@@ -179,12 +211,18 @@ const rr = () => {
   const showMode = (currentMode, index) => {
     if (index === 0) {
       setShowInsulinDateTime(true);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
     }
     if (index === 1) {
       setShowSensorDateTime(true);
+      setShowNeelDateTime(false);
+      setShowInsulinDateTime(false);
     }
     if (index === 2) {
       setShowNeelDateTime(true);
+      setShowSensorDateTime(false);
+      setShowInsulinDateTime(false);
     }
 
     setMode(currentMode);
@@ -201,15 +239,15 @@ const rr = () => {
   };
 
   const saveInsulinData = async (insulinDatum) => {
-    addChanges(tyraUserID, "Insulin", insulinDatum);
+    addChanges(uniqueDokumentId, "Insulin", insulinDatum);
   };
 
   const saveNeedleData = async (needleDatum) => {
-    addChanges(tyraUserID, "Needle", needleDatum);
+    addChanges(uniqueDokumentId, "Needle", needleDatum);
   };
 
   const saveSensorData = async (sensorDatum) => {
-    addChanges(tyraUserID, "Sensor", sensorDatum);
+    addChanges(uniqueDokumentId, "Sensor", sensorDatum);
   };
 
   const isDataAfter = (data) => {
@@ -227,12 +265,15 @@ const rr = () => {
   };
 
   const fetchData = async () => {
+    setShowInsulinDateTime(false);
+    setShowSensorDateTime(false);
+    setShowNeelDateTime(false);
     try {
       const [needleDataResponse, sensorDataResponse, insulinDataResponse] =
         await Promise.all([
-          listLatestChange(tyraUserID, "Needle"),
-          listLatestChange(tyraUserID, "Sensor"),
-          listLatestChange(tyraUserID, "Insulin"),
+          listLatestChange(uniqueDokumentId, "Needle"),
+          listLatestChange(uniqueDokumentId, "Sensor"),
+          listLatestChange(uniqueDokumentId, "Insulin"),
         ]);
 
       if (needleDataResponse) {
@@ -282,9 +323,9 @@ const rr = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 pt-6 bg-[#C8BCC6] ">
+    <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-[#74cdcd]">
       {showInsulinDateTime && (
-        <View className="m-2 items-center justify-center bg-[#EC9A29] rounded-xl">
+        <View className="items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -293,7 +334,7 @@ const rr = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeInsulin}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
                 size="20"
               />
             </View>
@@ -301,7 +342,7 @@ const rr = () => {
         </View>
       )}
       {showSensorDateTime && (
-        <View className="m-2 items-center justify-center bg-[#d9a3ff] rounded-xl">
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -310,14 +351,14 @@ const rr = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeSensor}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
               />
             </View>
           </View>
         </View>
       )}
       {showNeelDateTime && (
-        <View className="m-2 items-center justify-center bg-[#d9a3ff] rounded-xl">
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
           <View>
             <View>
               <DateTimePicker
@@ -326,182 +367,144 @@ const rr = () => {
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeNeel}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
+                display={Platform.OS === "ios" ? "inline" : "default"}
               />
             </View>
           </View>
         </View>
       )}
-      <View className="p-2">
-        <View className="flex-row mb-3 h-8 justify-center">
-          <Text className="font-extrabold text-2xl text-[#143642]">
-            Tidsstämpling
+      <View className="flex-row p-1">
+        <View>
+          <Link href="modal" asChild>
+            <Pressable>
+              {({ pressed }) => (
+                <Ionicons name="settings-outline" size={30} color="white" />
+              )}
+            </Pressable>
+          </Link>
+        </View>
+        <View className="grow items-center ">
+          <Text className="text-2xl font-bold text-white">Singelvisa</Text>
+        </View>
+        <View className="flex-none mr-1">
+          <TouchableOpacity onPress={() => fetchData()}>
+            <Ionicons name="reload" size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
+        <View style={{ flex: 2 }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => onPressInsulin(moment.now())}
+                style={{ width: 100, height: 100 }}
+                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
+              >
+                <Entypo name="water" size={24} color="white" />
+                <Text className="text-xl font-normal text-white">Insulin</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => showDatepicker(0)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
+                <Text className="text-xl font-normal text-white">Justera</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        <View
+          style={{ flex: 1 }}
+          className="items-center justify-center bg-[#eda034]"
+        >
+          <Text
+            className="text-xl font-bold"
+            style={{
+              color: isInsulinDataAfter ? "red" : "black",
+            }}
+          >
+            {insulinData === null ? loadingMessage : insulinData}
           </Text>
         </View>
-        <View className="flex-1 flex-col gap-2">
-          <View
-            style={{
-              height: Platform.OS === "ios" ? iosH : androidH,
-            }}
-            className="bg-[#143642]  rounded-lg "
-          >
-            <View className="flex-1 flex-col gap-4 items-center justify-center">
-              <View>
-                <View className="flex-row gap-16">
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => onPressInsulin(moment.now())}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">
-                        Insulin
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => showDatepicker(0)}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">
-                        Justera
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              <View>
-                <Text
-                  className="text-xl font-bold"
-                  style={{
-                    color: isInsulinDataAfter ? "red" : "white",
-                  }}
-                >
-                  {insulinData === null ? loadingMessage : insulinData}
-                </Text>
-              </View>
+      </View>
+      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
+        <View style={{ flex: 2 }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => onPressNeedle(moment.now())}
+                style={{ width: 100, height: 100 }}
+                className="items-center justify-center bg-[#0F8B8D]   p-4 rounded-xl"
+              >
+                <MaterialCommunityIcons name="needle" size={40} color="white" />
+                <Text className="text-xl font-normal text-white">Nål</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => showDatepicker(2)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
+                <Text className="text-xl font-normal text-white">Justera</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View
+        </View>
+        <View
+          style={{ flex: 1 }}
+          className="items-center justify-center bg-[#eda034]"
+        >
+          <Text
+            className="text-xl font-bold text-white"
             style={{
-              height: Platform.OS === "ios" ? iosH : androidH,
+              color: isNeedleDataAfter ? "red" : "black",
             }}
-            className="bg-[#143642]  rounded-lg"
           >
-            <View className="flex-1 flex-col gap-4 items-center justify-center">
-              <View>
-                <View className="flex-row gap-16">
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => onPressNeedle(moment.now())}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full  items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">Nål</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => showDatepicker(2)}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">
-                        Justera
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              <View>
-                <Text
-                  className="text-xl font-bold text-white"
-                  style={{
-                    color: isNeedleDataAfter ? "red" : "white",
-                  }}
-                >
-                  {needleData === null ? loadingMessage : needleData}
-                </Text>
-              </View>
+            {needleData === null ? loadingMessage : needleData}
+          </Text>
+        </View>
+      </View>
+      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
+        <View style={{ flex: 2 }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => onPressSensor(moment.now())}
+                style={{ width: 100, height: 100 }}
+                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
+              >
+                <Ionicons name="wifi" size={40} color="white" />
+                <Text className="text-xl font-normal text-white">Sensor</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 3 }} className="justify-center items-center">
+              <TouchableOpacity
+                onPress={() => showDatepicker(1)}
+                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
+              >
+                <Text className="text-xl font-normal text-white">Justera</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View
+        </View>
+        <View
+          style={{ flex: 1 }}
+          className="items-center justify-center bg-[#eda034]"
+        >
+          <Text
+            className="text-xl font-bold"
             style={{
-              height: Platform.OS === "ios" ? iosH : androidH,
+              color: isSensorDataAfter ? "red" : "black",
             }}
-            className="bg-[#143642]  rounded-lg "
           >
-            <View className="flex-1 flex-col gap-4 items-center justify-center">
-              <View>
-                <View className="flex-row gap-16">
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => onPressSensor(moment.now())}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full  items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">
-                        Sensor
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => showDatepicker(1)}
-                      style={{
-                        height: Platform.OS === "ios" ? ios : android,
-                        width: Platform.OS === "ios" ? ios : android,
-                      }}
-                      className=" bg-[#0F8B8D] rounded-full   items-center justify-center"
-                    >
-                      <Text className="text-white text-2xl font-bold">
-                        Justera
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              <View>
-                <Text
-                  className="text-xl font-bold"
-                  style={{
-                    color: isSensorDataAfter ? "red" : "white",
-                  }}
-                >
-                  {sensorData === null ? loadingMessage : sensorData}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View className="m-2 p-2  items-center justify-center ">
-            <TouchableOpacity
-              className="w-16 h-16 bg-[#EC9A29] rounded-full items-center justify-center"
-              onPress={() => fetchData()}
-            >
-              <Ionicons name="reload" size={40} color="black" />
-            </TouchableOpacity>
-          </View>
+            {sensorData === null ? loadingMessage : sensorData}
+          </Text>
         </View>
       </View>
     </SafeAreaView>
   );
 };
 
-export default rr;
+export default index;

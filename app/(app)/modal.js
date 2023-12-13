@@ -6,6 +6,7 @@ import {
   Image,
   useColorScheme,
   Platform,
+  TextInput,
 } from "react-native";
 import { Link, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -18,8 +19,8 @@ export default function Modal() {
   const isPresented = router.canGoBack();
   const colorScheme = useColorScheme();
   return (
-    <SafeAreaView className="flex-1 flex-col   bg-[#74cdcd]">
-      <View className="p-2">
+    <>
+      <View className="flex-1 flex-col p-4  bg-[#3c6f6f]">
         <View className="flex-row">
           <View>
             <Link href="/" asChild>
@@ -47,6 +48,9 @@ export default function Modal() {
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </View>
-    </SafeAreaView>
+      <View>
+        <TextInput className="m-2 p-1 border-{1px} border-gray-200"></TextInput>
+      </View>
+    </>
   );
 }
