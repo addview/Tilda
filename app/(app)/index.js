@@ -21,6 +21,7 @@ import {
   where,
   orderBy,
   limit,
+  updateDoc,
 } from "firebase/firestore";
 import { Link } from "expo-router";
 import { FIREBASE_DB } from "../../firebaseConfig";
@@ -53,6 +54,7 @@ const index = () => {
   const [isInsulinDataAfter, setIsInsulinDataAfter] = useState(false);
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
   const [uniqueDokumentId, setUniqueDokumentId] = useState(null);
+  const [userName, setUserName] = useState(null);
 
   useEffect(() => {
     const executeAsyncFunctions = async () => {
@@ -87,8 +89,11 @@ const index = () => {
     getUserIntervall(session); // Och sist denna
   }, [uniqueDokumentId]);
 
+  useEffect(() => {
+    console.log("juse effect");
+  }, []);
+
   const getUserByEmail = async (session) => {
-    console.log("längd", session.length);
     const q = query(
       collection(db, "users"),
       where("email", "==", session),
@@ -109,7 +114,7 @@ const index = () => {
   const getUserIntervall = async (email) => {
     const q = query(
       collection(db, "users"),
-      where("email", "==", "tyra@slowmotion.se"),
+      where("email", "==", session),
       limit(1)
     );
 
@@ -129,6 +134,7 @@ const index = () => {
     setIntervalDataInsulin(latestDoc.data().insulin);
     setIntervalDataNeedle(latestDoc.data().needle);
     setIntervalDataSensor(latestDoc.data().sensor);
+    setUserName(latestDoc.data().Namn);
     return latestDoc.data();
   };
 
@@ -151,10 +157,9 @@ const index = () => {
   };
 
   const addChanges = async (userId, changeType, date) => {
-    console.log("add", userId);
-
     let fixDate = moment(date, "dddd, Do MMMM , HH:mm").format("L");
     let fixTime = moment(date, "dddd, Do MMMM , HH:mm").format("LT");
+
     const docRef = await addDoc(collection(db, "changes"), {
       changeType: changeType,
       dateChanged: fixDate,
@@ -375,7 +380,19 @@ const index = () => {
       )}
       <View className="flex-row p-1">
         <View>
-          <Link href="modal" asChild>
+          <Link
+            href={{
+              pathname: "interval/[id]",
+              params: {
+                insulin:
+                  intervalDataInsulin === null ? "" : intervalDataInsulin,
+                needle: intervalDataNeedle === null ? "" : intervalDataNeedle,
+                sensor: intervalDataSensor === null ? "" : intervalDataSensor,
+                email: session === null ? "" : session,
+              },
+            }}
+            asChild
+          >
             <Pressable>
               {({ pressed }) => (
                 <Ionicons name="settings-outline" size={30} color="white" />
@@ -384,7 +401,9 @@ const index = () => {
           </Link>
         </View>
         <View className="grow items-center ">
-          <Text className="text-2xl font-bold text-white">Singelvisa</Text>
+          <Text className="text-2xl font-bold text-white">
+            {userName === null ? "Singelvisa" : "Anv. " + userName}
+          </Text>
         </View>
         <View className="flex-none mr-1">
           <TouchableOpacity onPress={() => fetchData()}>
