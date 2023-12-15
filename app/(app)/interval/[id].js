@@ -23,7 +23,7 @@ import {
   Entypo,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { FIREBASE_DB } from "../../../firebaseConfig";
 import {
   collection,
@@ -35,10 +35,12 @@ import {
   limit,
   updateDoc,
 } from "firebase/firestore";
+import { store } from "../../../store";
 
 const db = FIREBASE_DB;
 
 export default function interval() {
+  const { state, dispatch } = useContext(store);
   const params = useLocalSearchParams();
   // If the page was reloaded or navigated to directly, then the modal should be presented as
   // a full screen page. You may need to change the UI to account for this.
@@ -136,6 +138,10 @@ export default function interval() {
               <TouchableOpacity
                 onPress={() => {
                   setIntervalDataInsulin(intervalDataInsulin + 1);
+                  dispatch({
+                    type: "CHANGE_INSULIN",
+                    payload: intervalDataInsulin + 1,
+                  });
                 }}
               >
                 <AntDesign name="pluscircleo" size={40} color="white" />

@@ -16,7 +16,7 @@ import {
   SimpleLineIcons,
   Ionicons,
 } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 export default function Modal({ params }) {
   // If the page was reloaded or navigated to directly, then the modal should be presented as

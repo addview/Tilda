@@ -1,10 +1,13 @@
-import { Stack, Redirect, Slot, SplashScreen } from "expo-router";
+import { Slot } from "expo-router";
 import { SessionProvider } from "../context/Ctx";
+import { StateProvider } from "../store";
 
 export default function Layout() {
   return (
-    <SessionProvider>
-      <Slot />
-    </SessionProvider>
+    <StateProvider>
+      <SessionProvider>
+        <Slot />
+      </SessionProvider>
+    </StateProvider>
   );
 }

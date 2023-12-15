@@ -1,6 +1,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSession } from "../../context/Ctx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Text,
   View,
@@ -25,10 +25,12 @@ import {
 } from "firebase/firestore";
 import { Link } from "expo-router";
 import { FIREBASE_DB } from "../../firebaseConfig";
+import { store } from "../../store.js";
 
 const db = FIREBASE_DB;
 
 const index = () => {
+  const { state, dispatch } = useContext(store);
   const ios = "20%";
   const android = "90%";
   const iosH = 215;
@@ -89,8 +91,13 @@ const index = () => {
     getUserIntervall(session); // Och sist denna
   }, [uniqueDokumentId]);
 
+  //ta bort sedan
+  const globalState = useContext(store);
+
   useEffect(() => {
     console.log("juse effect");
+
+    console.log(globalState); // this will return { color: red }
   }, []);
 
   const getUserByEmail = async (session) => {
@@ -135,6 +142,7 @@ const index = () => {
     setIntervalDataNeedle(latestDoc.data().needle);
     setIntervalDataSensor(latestDoc.data().sensor);
     setUserName(latestDoc.data().Namn);
+    dispatch({ type: "CHANGE_INSULIN", payload: latestDoc.data().insulin });
     return latestDoc.data();
   };
 
@@ -402,7 +410,9 @@ const index = () => {
         </View>
         <View className="grow items-center ">
           <Text className="text-2xl font-bold text-white">
-            {userName === null ? "Singelvisa" : "Anv. " + userName}
+            {userName === null
+              ? "Singelvisa"
+              : "Anv. " + userName + state.insulin}
           </Text>
         </View>
         <View className="flex-none mr-1">
