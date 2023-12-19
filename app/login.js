@@ -63,66 +63,64 @@ const login = () => {
   }, [session]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-[#20696a]">
-      <View className="justify-center items-center pt-5">
-        <View className="mb-4">
+    <SafeAreaView style={{ flex: 1 }} className="bg-[#20696a] justify-center ">
+      <View className="justify-center items-center ">
+        <View className="items-center">
+          <Image
+            style={{ height: 100, width: 100 }}
+            className="flex"
+            source={require("../assets/login.png")}
+            contentFit="contain"
+          />
           <Text className="text-4xl font-normal text-white">Singelvisa</Text>
         </View>
-        <Image
-          style={{ height: 200, width: 200 }}
-          className="flex"
-          source={require("../assets/login.png")}
-          contentFit="contain"
-        />
 
-        <View className="w-full p-4 mt-5 mb-5">
+        <View className="flex flex-col w-full p-4 ">
           <KeyboardAvoidingView behavior="padding">
             <TextInput
               onChangeText={(text) => setEmail(text)}
               placeholder="Ange din email"
-              className="h-12 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
+              className="h-10 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
             />
             <TextInput
               secureTextEntry={true}
               onChangeText={(text) => setPassword(text)}
               placeholder="Ange ditt lösenord"
-              className="mt-2 h-12 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
+              className="mt-2 h-10 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
             />
-          </KeyboardAvoidingView>
-          {loading ? (
-            <ActivityIndicator
-              className="flex-1"
-              size="large"
-              color="#0000ff"
-            ></ActivityIndicator>
-          ) : (
-            <>
-              <View className="pt-2">
+
+            {loading ? (
+              <ActivityIndicator
+                className="flex"
+                size="large"
+                color="#fff"
+              ></ActivityIndicator>
+            ) : (
+              <View className="flex flex-row-reverse   mt-2">
                 <TouchableOpacity
-                  className="bg-[#eda034] rounded-lg h-10 w-full"
+                  className="bg-[#eda034]   rounded-md py-1 px-2"
                   onPress={signIn}
                 >
-                  <View className="flex flex-row items-center justify-center">
-                    <Text className="text-xl p-1 text-black font-normal">
+                  <View className="flex flex-row items-center justify-center ">
+                    <Text className="text-xl  text-black font-normal">
                       Logga in
                     </Text>
                   </View>
                 </TouchableOpacity>
-              </View>
-              <View className="pt-2">
+
                 <TouchableOpacity
-                  className="bg-[#eda034] rounded-lg h-10 w-full"
+                  className="bg-[#eda034] mr-2 space-x-2 rounded-md py-1 px-2"
                   onPress={signUp}
                 >
                   <View className="flex flex-row items-center justify-center">
-                    <Text className="text-xl p-1 text-black font-normal">
+                    <Text className="text-xl text-black font-normal">
                       Skapa konto
                     </Text>
                   </View>
                 </TouchableOpacity>
               </View>
-            </>
-          )}
+            )}
+          </KeyboardAvoidingView>
         </View>
       </View>
     </SafeAreaView>
