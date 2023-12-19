@@ -1,19 +1,10 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSession } from "../../context/Ctx";
 import { useEffect, useState, useContext } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  Platform,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
-import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
+import { Text, View, TouchableOpacity, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import "moment/locale/sv";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   collection,
   getDocs,
@@ -22,12 +13,10 @@ import {
   where,
   orderBy,
   limit,
-  updateDoc,
 } from "firebase/firestore";
 import { Link } from "expo-router";
 import { FIREBASE_DB } from "../../firebaseConfig";
 import { store } from "../../store.js";
-import { useLocalSearchParams } from "expo-router";
 import InsulineDateTime from "../../components/InsulineDateTime.js";
 import InsulinRegistration from "../../components/InsulinRegistration.js";
 import NeedleRegistration from "../../components/NeedleRegistration.js";
@@ -37,11 +26,6 @@ const db = FIREBASE_DB;
 
 const index = () => {
   const { state, dispatch } = useContext(store);
-  const ios = "20%";
-  const android = "90%";
-  const iosH = 215;
-  const androidH = 185;
-
   const { session, signOut, isLoading } = useSession();
   const [insulinData, setInsulinData] = useState(null);
   const [needleData, setNeedleData] = useState(null);
@@ -51,11 +35,9 @@ const index = () => {
   const [showInsulinDateTime, setShowInsulinDateTime] = useState(false);
   const [showSensorDateTime, setShowSensorDateTime] = useState(false);
   const [showNeelDateTime, setShowNeelDateTime] = useState(false);
-
   const [intervalDataInsulin, setIntervalDataInsulin] = useState(null);
   const [intervalDataNeedle, setIntervalDataNeedle] = useState(null);
   const [intervalDataSensor, setIntervalDataSensor] = useState(null);
-
   const [isNeedleDataAfter, setIsNeedleDataAfter] = useState(false);
   const [isInsulinDataAfter, setIsInsulinDataAfter] = useState(false);
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
