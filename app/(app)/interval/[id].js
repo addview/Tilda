@@ -36,11 +36,13 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { store } from "../../../store";
+import { useSession } from "../../../context/Ctx";
 
 const db = FIREBASE_DB;
 
 export default function interval() {
   const { state, dispatch } = useContext(store);
+  const { signOut, signIn, session, isLoading } = useSession();
   const params = useLocalSearchParams();
   // If the page was reloaded or navigated to directly, then the modal should be presented as
   // a full screen page. You may need to change the UI to account for this.
@@ -125,21 +127,24 @@ export default function interval() {
             </Pressable>
           </View>
           <View className="grow pl-4">
-            <Text className="text-2xl text-white font-bold">
-              Bytesintervall antal dagar
-            </Text>
+            <Text className="text-2xl text-white font-bold">Inställningar</Text>
           </View>
+        </View>
+        <View className="grow mt-4">
+          <Text className="text-2xl text-white font-bold">
+            Antaldagar - intervallbyte
+          </Text>
         </View>
 
         <View className="items-start p-2 ">
-          <View className="w-full bg-[#eda034] justify-center items-center p-1">
+          <View className="w-full bg-[#143642] justify-center items-center p-1">
             <View className="flex flex-row items-center justify-center">
-              <Entypo name="water" size={20} color="black" />
-              <Text className="text-xl p-1 text-black">Insulin</Text>
+              <Entypo name="water" size={20} color="white" />
+              <Text className="text-xl p-1 text-white">Insulin</Text>
             </View>
           </View>
 
-          <View className="flex flex-row space-x-4 p-2 bg-[#143642] w-full items-center justify-center">
+          <View className="flex flex-row space-x-4 p-2  bg-[#20696a] w-full items-center justify-center">
             <View className="">
               <TouchableOpacity
                 onPress={() => {
@@ -168,14 +173,14 @@ export default function interval() {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="w-full bg-[#eda034] justify-center items-center mt-2">
+          <View className="w-full  bg-[#143642] justify-center items-center mt-2">
             <View className="flex flex-row items-center justify-center">
-              <MaterialCommunityIcons name="needle" size={20} color="black" />
-              <Text className="text-xl p-1 text-black">Nål</Text>
+              <MaterialCommunityIcons name="needle" size={20} color="white" />
+              <Text className="text-xl p-1 text-white">Nål</Text>
             </View>
           </View>
 
-          <View className="flex flex-row space-x-4 p-2 bg-[#143642] w-full items-center justify-center">
+          <View className="flex flex-row space-x-4 p-2 bg-[#20696a] w-full items-center justify-center">
             <View className="">
               <TouchableOpacity
                 onPress={() => {
@@ -200,14 +205,14 @@ export default function interval() {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="w-full bg-[#eda034] justify-center items-center mt-2">
+          <View className="bg-[#143642] w-full justify-center items-center mt-2">
             <View className="flex flex-row items-center justify-center">
-              <Ionicons name="wifi" size={20} color="black" />
-              <Text className="text-xl p-1 text-black">Sensor</Text>
+              <Ionicons name="wifi" size={20} color="white" />
+              <Text className="text-xl p-1 text-white">Sensor</Text>
             </View>
           </View>
 
-          <View className="flex flex-row space-x-4 p-2 bg-[#143642] w-full items-center justify-center">
+          <View className="flex flex-row space-x-4 p-2  bg-[#20696a]   w-full items-center justify-center">
             <View>
               <TouchableOpacity
                 onPress={() => {
@@ -233,16 +238,34 @@ export default function interval() {
             </View>
           </View>
 
-          <View className="w-full bg-[#eda034] justify-center items-center mt-2 rounded-lg">
+          <View className="w-full bg-[#eda034] justify-center items-center mt-2 rounded-lg h-12">
             <TouchableOpacity onPress={() => listLatestChange()}>
               <View className="flex flex-row items-center justify-center">
-                <Ionicons name="reload" size={30} color="#000" />
-                <Text className="text-xl p-1 text-black font-bold">
-                  Uppdatera
+                <Ionicons name="reload" size={24} color="#000" />
+                <Text className="text-2xl p-1 text-black font-normal">
+                  Uppdatera intervallen
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
+        </View>
+
+        <View className="flex-row">
+          <View className="grow ">
+            <Text className="text-2xl text-white font-bold">Konto</Text>
+          </View>
+        </View>
+        <View className="p-2 ">
+          <TouchableOpacity
+            className="bg-[#eda034] rounded-lg h-12 w-full"
+            onPress={signOut}
+          >
+            <View className="flex flex-row items-center justify-center">
+              <Text className="text-2xl p-1 text-black font-normal">
+                Logga ut
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
