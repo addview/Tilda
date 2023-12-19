@@ -4,6 +4,7 @@ const initialState = {
   insulin: 0,
   needle: 0,
   sensor: 0,
+  changeinterval: false,
 };
 
 const store = createContext(initialState);
@@ -18,6 +19,8 @@ const StateProvider = ({ children }) => {
         return { ...state, needle: action.payload };
       case "CHANGE_SENSOR":
         return { ...state, sensor: action.payload };
+      case "CHANGE_INTERVAL":
+        return { ...state, changeinterval: action.payload };
       default:
         throw new Error();
     }

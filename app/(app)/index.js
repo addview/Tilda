@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -26,6 +27,7 @@ import {
 import { Link } from "expo-router";
 import { FIREBASE_DB } from "../../firebaseConfig";
 import { store } from "../../store.js";
+import { useLocalSearchParams } from "expo-router";
 
 const db = FIREBASE_DB;
 
@@ -37,8 +39,6 @@ const index = () => {
   const androidH = 185;
 
   const { session, signOut, isLoading } = useSession();
-  const tyraUserID = "tuxs3L8OjXlMk1kimdWI";
-  const loadingMessage = "..hämtar data";
   const [insulinData, setInsulinData] = useState(null);
   const [needleData, setNeedleData] = useState(null);
   const [sensorData, setSensorData] = useState(null);
@@ -57,6 +57,9 @@ const index = () => {
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
   const [uniqueDokumentId, setUniqueDokumentId] = useState(null);
   const [userName, setUserName] = useState(null);
+  const [textInsulinColor, setTextInsulinColor] = useState("black");
+  const [textNeedleColor, setTextNeedleColor] = useState("black");
+  const [textSensorColor, setTextSensorColor] = useState("black");
 
   useEffect(() => {
     const executeAsyncFunctions = async () => {
@@ -87,17 +90,19 @@ const index = () => {
 
   // En separat useEffect för att logga state när den ändras
   useEffect(() => {
-    fetchData(); // Därefter körs denna
-    getUserIntervall(session); // Och sist denna
+    if (uniqueDokumentId !== null) {
+      fetchData(); // Därefter körs denna
+      getUserIntervall(session); // Och sist denna
+    }
   }, [uniqueDokumentId]);
 
-  //ta bort sedan
-  const globalState = useContext(store);
-
   useEffect(() => {
+    console.log("ss", state.changeinterval);
+    if (state.changeinterval) {
+      fetchData();
+      getUserIntervall(session); // Och sist denna
+    }
     console.log("juse effect");
-
-    console.log(globalState); // this will return { color: red }
   }, []);
 
   const getUserByEmail = async (session) => {
@@ -138,11 +143,18 @@ const index = () => {
       return null;
     }
     const latestDoc = querySnapshot.docs[0];
+
+    console.log(latestDoc.data().insulin);
+    console.log(latestDoc.data().needle);
+    console.log(latestDoc.data().sensor);
+
     setIntervalDataInsulin(latestDoc.data().insulin);
     setIntervalDataNeedle(latestDoc.data().needle);
     setIntervalDataSensor(latestDoc.data().sensor);
     setUserName(latestDoc.data().Namn);
     dispatch({ type: "CHANGE_INSULIN", payload: latestDoc.data().insulin });
+    dispatch({ type: "CHANGE_NEEDLE", payload: latestDoc.data().needle });
+    dispatch({ type: "CHANGE_SENSOR", payload: latestDoc.data().sensor });
     return latestDoc.data();
   };
 
@@ -192,6 +204,7 @@ const index = () => {
 
       let dateTimeStr = _insulinDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextInsulinColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
       setInsulinData(updatedDateTimeStr);
       saveInsulinData(updatedDateTimeStr);
     }
@@ -204,6 +217,7 @@ const index = () => {
 
       let dateTimeStr = _sensorDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextSensorColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
       setSensorData(updatedDateTimeStr);
       saveSensorData(updatedDateTimeStr);
     }
@@ -216,6 +230,7 @@ const index = () => {
 
       let dateTimeStr = _neelDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextNeedleColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
       setNeedleData(updatedDateTimeStr);
       saveNeedleData(updatedDateTimeStr);
     }
@@ -290,18 +305,19 @@ const index = () => {
         ]);
 
       if (needleDataResponse) {
-        const dateFix =
+        const needleDateFix =
           needleDataResponse.dateChanged + " " + needleDataResponse.timeChanged;
-        const dateFormat = "YYYY-MM-DD HH:mm:ss"; // Anpassa formatet efter ditt datums och tidsformat
-        setNeedleData(
-          moment(dateFix, dateFormat).format("dddd, Do MMMM , HH:mm")
-        );
+        const needleRes = moment(needleDateFix).format("dddd, Do MMMM , HH:mm");
+        setNeedleData(needleRes);
+        setTextNeedleColor(isDataAfter(needleRes) ? "red" : "black");
       }
 
       if (sensorDataResponse) {
         const sensorDateFix =
           sensorDataResponse.dateChanged + " " + sensorDataResponse.timeChanged;
-        setSensorData(moment(sensorDateFix).format("dddd, Do MMMM , HH:mm"));
+        const sensorRes = moment(sensorDateFix).format("dddd, Do MMMM , HH:mm");
+        setSensorData(sensorRes);
+        setTextSensorColor(isDataAfter(sensorRes) ? "red" : "black");
       }
 
       if (insulinDataResponse) {
@@ -309,7 +325,11 @@ const index = () => {
           insulinDataResponse.dateChanged +
           " " +
           insulinDataResponse.timeChanged;
-        setInsulinData(moment(insulinDateFix).format("dddd, Do MMMM , HH:mm"));
+        const isulinRes = moment(insulinDateFix).format(
+          "dddd, Do MMMM , HH:mm"
+        );
+        setInsulinData(isulinRes);
+        setTextInsulinColor(isDataAfter(isulinRes) ? "red" : "black");
       }
     } catch (error) {
       alert("Fel vid hämtning av data.");
@@ -318,18 +338,21 @@ const index = () => {
 
   const onPressInsulin = (date) => {
     const _insulindate = addRegDays(date, intervalDataInsulin);
+    setTextInsulinColor(isDataAfter(_insulindate) ? "red" : "black");
     setShowInsulinDateTime(false);
     setInsulinData(_insulindate);
     saveInsulinData(_insulindate);
   };
   const onPressNeedle = (date) => {
     const _needledate = addRegDays(date, intervalDataNeedle);
+    setTextNeedleColor(isDataAfter(_needledate) ? "red" : "black");
     setShowNeelDateTime(false);
     setNeedleData(_needledate);
     saveNeedleData(_needledate);
   };
   const onPressSensor = (date) => {
     const _sensordate = addRegDays(date, intervalDataSensor);
+    setTextSensorColor(isDataAfter(_sensordate) ? "red" : "black");
     setShowSensorDateTime(false);
     setSensorData(_sensordate);
     saveSensorData(_sensordate);
@@ -410,9 +433,7 @@ const index = () => {
         </View>
         <View className="grow items-center ">
           <Text className="text-2xl font-bold text-white">
-            {userName === null
-              ? "Singelvisa"
-              : "Anv. " + userName + state.insulin}
+            {userName === null ? "Singelvisa" : "Anv. " + userName}
           </Text>
         </View>
         <View className="flex-none mr-1">
@@ -451,10 +472,14 @@ const index = () => {
           <Text
             className="text-xl font-bold"
             style={{
-              color: isInsulinDataAfter ? "red" : "black",
+              color: textInsulinColor,
             }}
           >
-            {insulinData === null ? loadingMessage : insulinData}
+            {insulinData === null ? (
+              <ActivityIndicator size="large" color="#20696a" />
+            ) : (
+              insulinData
+            )}
           </Text>
         </View>
       </View>
@@ -486,12 +511,16 @@ const index = () => {
           className="items-center justify-center bg-[#eda034]"
         >
           <Text
-            className="text-xl font-bold text-white"
+            className="text-xl font-bold"
             style={{
-              color: isNeedleDataAfter ? "red" : "black",
+              color: textNeedleColor,
             }}
           >
-            {needleData === null ? loadingMessage : needleData}
+            {needleData === null ? (
+              <ActivityIndicator size="large" color="#20696a" />
+            ) : (
+              needleData
+            )}
           </Text>
         </View>
       </View>
@@ -525,10 +554,14 @@ const index = () => {
           <Text
             className="text-xl font-bold"
             style={{
-              color: isSensorDataAfter ? "red" : "black",
+              color: textSensorColor,
             }}
           >
-            {sensorData === null ? loadingMessage : sensorData}
+            {sensorData === null ? (
+              <ActivityIndicator size="large" color="#20696a" />
+            ) : (
+              sensorData
+            )}
           </Text>
         </View>
       </View>

@@ -72,6 +72,9 @@ export default function interval() {
     })
       .then(() => {
         console.log("Dokumentet uppdaterat!");
+        dispatch({ type: "CHANGE_INSULIN", payload: intervalDataInsulin });
+        dispatch({ type: "CHANGE_NEEDLE", payload: intervalDataNeedle });
+        dispatch({ type: "CHANGE_SENSOR", payload: intervalDataSensor });
       })
       .catch((error) => {
         console.error("Fel vid uppdatering:", error);
@@ -79,11 +82,11 @@ export default function interval() {
   };
 
   useEffect(() => {
-    setIntervalDataNeedle(parseInt(params.needle));
+    setIntervalDataNeedle(parseInt(state.needle));
 
-    setIntervalDataSensor(parseInt(params.sensor));
+    setIntervalDataSensor(parseInt(state.sensor));
 
-    setIntervalDataInsulin(parseInt(params.insulin));
+    setIntervalDataInsulin(parseInt(state.insulin));
 
     setTargetEmail(params.email);
     console.log(params.email);
@@ -99,24 +102,27 @@ export default function interval() {
     if (intervalDataInsulin) {
       setIntervalDataInsulin(intervalDataInsulin);
     }
+    dispatch({ type: "CHANGE_INTERVAL", payload: true });
   }, [intervalDataNeedle, intervalDataSensor, intervalDataInsulin]);
+
+  const nav = () => {
+    router.replace("/");
+  };
 
   return (
     <SafeAreaView className=" bg-[#74cdcd]" style={{ flex: 1 }}>
       <View className="p-2">
         <View className="flex-row">
           <View className="flex-none">
-            <Link href="/" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <Ionicons
-                    name="arrow-back-circle-outline"
-                    size={35}
-                    color="white"
-                  />
-                )}
-              </Pressable>
-            </Link>
+            <Pressable onPress={() => nav()}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="arrow-back-circle-outline"
+                  size={35}
+                  color="white"
+                />
+              )}
+            </Pressable>
           </View>
           <View className="grow pl-4">
             <Text className="text-2xl text-white font-bold">
