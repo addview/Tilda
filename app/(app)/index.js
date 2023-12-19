@@ -28,6 +28,10 @@ import { Link } from "expo-router";
 import { FIREBASE_DB } from "../../firebaseConfig";
 import { store } from "../../store.js";
 import { useLocalSearchParams } from "expo-router";
+import InsulineDateTime from "../../components/InsulineDateTime.js";
+import InsulinRegistration from "../../components/InsulinRegistration.js";
+import NeedleRegistration from "../../components/NeedleRegistration.js";
+import SensorRegistration from "../../components/SensorRegistration.js";
 
 const db = FIREBASE_DB;
 
@@ -360,55 +364,16 @@ const index = () => {
 
   return (
     <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-[#74cdcd]">
-      {showInsulinDateTime && (
-        <View className="items-center justify-center bg-[#3d9a9c] rounded-xl">
-          <View>
-            <View>
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode={mode}
-                is24Hour={true}
-                onChange={onChangeInsulin}
-                display={Platform.OS === "ios" ? "inline" : "default"}
-                size="20"
-              />
-            </View>
-          </View>
-        </View>
-      )}
-      {showSensorDateTime && (
-        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
-          <View>
-            <View>
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode={mode}
-                is24Hour={true}
-                onChange={onChangeSensor}
-                display={Platform.OS === "ios" ? "inline" : "default"}
-              />
-            </View>
-          </View>
-        </View>
-      )}
-      {showNeelDateTime && (
-        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
-          <View>
-            <View>
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode={mode}
-                is24Hour={true}
-                onChange={onChangeNeel}
-                display={Platform.OS === "ios" ? "inline" : "default"}
-              />
-            </View>
-          </View>
-        </View>
-      )}
+      <InsulineDateTime
+        showInsulinDateTime={showInsulinDateTime}
+        showSensorDateTime={showSensorDateTime}
+        showNeelDateTime={showNeelDateTime}
+        onChangeInsulin={onChangeInsulin}
+        onChangeSensor={onChangeSensor}
+        onChangeNeel={onChangeNeel}
+        date={date}
+        mode={mode}
+      />
       <View className="flex-row p-1">
         <View>
           <Link
@@ -443,127 +408,28 @@ const index = () => {
         </View>
       </View>
       <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => onPressInsulin(moment.now())}
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
-              >
-                <Entypo name="water" size={24} color="white" />
-                <Text className="text-xl font-normal text-white">Insulin</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => showDatepicker(0)}
-                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
-              >
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text
-            className="text-xl font-bold"
-            style={{
-              color: textInsulinColor,
-            }}
-          >
-            {insulinData === null ? (
-              <ActivityIndicator size="large" color="#20696a" />
-            ) : (
-              insulinData
-            )}
-          </Text>
-        </View>
+        <InsulinRegistration
+          onPressInsulin={onPressInsulin}
+          showDatepicker={showDatepicker}
+          textInsulinColor={textInsulinColor}
+          insulinData={insulinData}
+        />
       </View>
       <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => onPressNeedle(moment.now())}
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]   p-4 rounded-xl"
-              >
-                <MaterialCommunityIcons name="needle" size={40} color="white" />
-                <Text className="text-xl font-normal text-white">Nål</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => showDatepicker(2)}
-                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
-              >
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text
-            className="text-xl font-bold"
-            style={{
-              color: textNeedleColor,
-            }}
-          >
-            {needleData === null ? (
-              <ActivityIndicator size="large" color="#20696a" />
-            ) : (
-              needleData
-            )}
-          </Text>
-        </View>
+        <NeedleRegistration
+          onPressNeedle={onPressNeedle}
+          showDatepicker={showDatepicker}
+          textNeedleColor={textNeedleColor}
+          needleData={needleData}
+        />
       </View>
       <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => onPressSensor(moment.now())}
-                style={{ width: 100, height: 100 }}
-                className="items-center justify-center bg-[#0F8B8D]  p-4 rounded-xl"
-              >
-                <Ionicons name="wifi" size={40} color="white" />
-                <Text className="text-xl font-normal text-white">Sensor</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 3 }} className="justify-center items-center">
-              <TouchableOpacity
-                onPress={() => showDatepicker(1)}
-                className="items-center justify-center bg-[#20696a] p-4 rounded-xl"
-              >
-                <Text className="text-xl font-normal text-white">Justera</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{ flex: 1 }}
-          className="items-center justify-center bg-[#eda034]"
-        >
-          <Text
-            className="text-xl font-bold"
-            style={{
-              color: textSensorColor,
-            }}
-          >
-            {sensorData === null ? (
-              <ActivityIndicator size="large" color="#20696a" />
-            ) : (
-              sensorData
-            )}
-          </Text>
-        </View>
+        <SensorRegistration
+          onPressSensor={onPressSensor}
+          showDatepicker={showDatepicker}
+          textSensorColor={textSensorColor}
+          sensorData={sensorData}
+        />
       </View>
     </SafeAreaView>
   );
