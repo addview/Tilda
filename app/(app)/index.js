@@ -1,7 +1,13 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSession } from "../../context/Ctx";
 import { useEffect, useState, useContext } from "react";
-import { Text, View, TouchableOpacity, Pressable } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import "moment/locale/sv";
@@ -345,17 +351,7 @@ const index = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 flex-col gap-2 p-2 bg-[#74cdcd]">
-      <InsulineDateTime
-        showInsulinDateTime={showInsulinDateTime}
-        showSensorDateTime={showSensorDateTime}
-        showNeelDateTime={showNeelDateTime}
-        onChangeInsulin={onChangeInsulin}
-        onChangeSensor={onChangeSensor}
-        onChangeNeel={onChangeNeel}
-        date={date}
-        mode={mode}
-      />
+    <SafeAreaView className="flex-1  bg-[#74cdcd]">
       <View className="flex-row p-1">
         <View>
           <Link
@@ -389,30 +385,77 @@ const index = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <InsulinRegistration
-          onPressInsulin={onPressInsulin}
-          showDatepicker={showDatepicker}
-          textInsulinColor={textInsulinColor}
-          insulinData={insulinData}
+
+      <ScrollView style={{ flex: 1 }}>
+        <InsulineDateTime
+          showInsulinDateTime={showInsulinDateTime}
+          showSensorDateTime={showSensorDateTime}
+          showNeelDateTime={showNeelDateTime}
+          onChangeInsulin={onChangeInsulin}
+          onChangeSensor={onChangeSensor}
+          onChangeNeel={onChangeNeel}
+          date={date}
+          mode={mode}
         />
-      </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <NeedleRegistration
-          onPressNeedle={onPressNeedle}
-          showDatepicker={showDatepicker}
-          textNeedleColor={textNeedleColor}
-          needleData={needleData}
-        />
-      </View>
-      <View style={{ flex: 3 }} className="bg-[#143642] rounded-xl">
-        <SensorRegistration
-          onPressSensor={onPressSensor}
-          showDatepicker={showDatepicker}
-          textSensorColor={textSensorColor}
-          sensorData={sensorData}
-        />
-      </View>
+        <View className="flex-1 flex-col gap-3 p-2 bg-[#74cdcd]">
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <InsulinRegistration
+              onPressInsulin={onPressInsulin}
+              showDatepicker={showDatepicker}
+              textInsulinColor={textInsulinColor}
+              insulinData={insulinData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <NeedleRegistration
+              onPressNeedle={onPressNeedle}
+              showDatepicker={showDatepicker}
+              textNeedleColor={textNeedleColor}
+              needleData={needleData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <SensorRegistration
+              onPressSensor={onPressSensor}
+              showDatepicker={showDatepicker}
+              textSensorColor={textSensorColor}
+              sensorData={sensorData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <InsulinRegistration
+              onPressInsulin={onPressInsulin}
+              showDatepicker={showDatepicker}
+              textInsulinColor={textInsulinColor}
+              insulinData={insulinData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <NeedleRegistration
+              onPressNeedle={onPressNeedle}
+              showDatepicker={showDatepicker}
+              textNeedleColor={textNeedleColor}
+              needleData={needleData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <SensorRegistration
+              onPressSensor={onPressSensor}
+              showDatepicker={showDatepicker}
+              textSensorColor={textSensorColor}
+              sensorData={sensorData}
+            />
+          </View>
+          <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
+            <SensorRegistration
+              onPressSensor={onPressSensor}
+              showDatepicker={showDatepicker}
+              textSensorColor={textSensorColor}
+              sensorData={sensorData}
+            />
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

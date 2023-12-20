@@ -33,7 +33,7 @@ const NeedleRegistration = ({
         </View>
       </View>
       <View
-        style={{ flex: 1 }}
+        style={{ padding: Platform.OS === "ios" ? 10 : 4 }}
         className="items-center justify-center bg-[#eda034]"
       >
         <Text

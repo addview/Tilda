@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import moment from "moment";
 const InsulinRegistration = ({
@@ -32,7 +38,7 @@ const InsulinRegistration = ({
         </View>
       </View>
       <View
-        style={{ flex: 1 }}
+        style={{ padding: Platform.OS === "ios" ? 10 : 4 }}
         className="items-center justify-center bg-[#eda034]"
       >
         <Text
