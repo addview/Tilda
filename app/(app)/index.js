@@ -28,30 +28,62 @@ import InsulinRegistration from "../../components/InsulinRegistration.js";
 import NeedleRegistration from "../../components/NeedleRegistration.js";
 import SensorRegistration from "../../components/SensorRegistration.js";
 
+import SparePenMealRegistration from "../../components/SparePenMealRegistration.js";
+import SparePenLongTermRegistration from "../../components/SparePenLongTermRegistration.js";
+import GlucagenRegistration from "../../components/GlucagenRegistration.js";
+import TransmitterRegistration from "../../components/TransmitterRegistration.js";
+
 const db = FIREBASE_DB;
 
 const index = () => {
   const { state, dispatch } = useContext(store);
   const { session, signOut, isLoading } = useSession();
+
   const [insulinData, setInsulinData] = useState(null);
   const [needleData, setNeedleData] = useState(null);
   const [sensorData, setSensorData] = useState(null);
+  const [transmitterData, setTransmitterData] = useState(null);
+  const [glucagenData, setGlucagenData] = useState(null);
+  const [sparepenLongTermData, setSparepenLongTermData] = useState(null);
+  const [sparepenMealData, setSparepenMealData] = useState(null);
+
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
+
   const [showInsulinDateTime, setShowInsulinDateTime] = useState(false);
   const [showSensorDateTime, setShowSensorDateTime] = useState(false);
   const [showNeelDateTime, setShowNeelDateTime] = useState(false);
+  const [showTransmitterDateTime, setShowTransmitterDateTime] = useState(false);
+  const [showGlucaGenDateTime, setShowGlucaGenDateTime] = useState(false);
+  const [showSparepenLongTermDateTime, setShowSparepenLongTermDateTime] =
+    useState(false);
+  const [showSparepenMealDateTime, setShowSparepenMealDateTime] =
+    useState(false);
+
   const [intervalDataInsulin, setIntervalDataInsulin] = useState(null);
   const [intervalDataNeedle, setIntervalDataNeedle] = useState(null);
   const [intervalDataSensor, setIntervalDataSensor] = useState(null);
+  const [intervalDataTransmitter, setIntervalDataTransmitter] = useState(null);
+  const [intervalDataSparepenLongTerm, setIntervalDataSparepenLongTerm] =
+    useState(null);
+  const [intervalDataSparepenMeal, setIntervalDataSparepenMeal] =
+    useState(null);
+  const [intervalDataGlucaGen, setIntervalDataGlucaGen] = useState(null);
+
   const [isNeedleDataAfter, setIsNeedleDataAfter] = useState(false);
   const [isInsulinDataAfter, setIsInsulinDataAfter] = useState(false);
   const [isSensorDataAfter, setIsSensorDataAfter] = useState(false);
   const [uniqueDokumentId, setUniqueDokumentId] = useState(null);
   const [userName, setUserName] = useState(null);
+
   const [textInsulinColor, setTextInsulinColor] = useState("black");
   const [textNeedleColor, setTextNeedleColor] = useState("black");
   const [textSensorColor, setTextSensorColor] = useState("black");
+  const [textTransmitterColor, setTextTransmitterColor] = useState("black");
+  const [textSparepenLongTermColor, setTextSparepenLongTermColor] =
+    useState("black");
+  const [textSparepenMealColor, setTextSparepenMealColor] = useState("black");
+  const [textGlucaGenColor, setTextGlucaGenColor] = useState("black");
 
   useEffect(() => {
     const executeAsyncFunctions = async () => {
@@ -78,7 +110,27 @@ const index = () => {
     if (sensorData) {
       setIsSensorDataAfter(isDataAfter(sensorData));
     }
-  }, [needleData, insulinData, sensorData]);
+    if (glucagenData) {
+      setIsSensorDataAfter(isDataAfter(glucagenData));
+    }
+    if (sparepenLongTermData) {
+      setIsSensorDataAfter(isDataAfter(sparepenLongTermData));
+    }
+    if (sparepenMealData) {
+      setIsSensorDataAfter(isDataAfter(sparepenMealData));
+    }
+    if (transmitterData) {
+      setIsSensorDataAfter(isDataAfter(transmitterData));
+    }
+  }, [
+    needleData,
+    insulinData,
+    sensorData,
+    glucagenData,
+    sparepenLongTermData,
+    sparepenMealData,
+    transmitterData,
+  ]);
 
   // En separat useEffect för att logga state när den ändras
   useEffect(() => {
@@ -89,12 +141,10 @@ const index = () => {
   }, [uniqueDokumentId]);
 
   useEffect(() => {
-    console.log("ss", state.changeinterval);
     if (state.changeinterval) {
       fetchData();
       getUserIntervall(session); // Och sist denna
     }
-    console.log("juse effect");
   }, []);
 
   const getUserByEmail = async (session) => {
@@ -132,21 +182,40 @@ const index = () => {
       setInsulinData(null);
       setNeedleData(null);
       setSensorData(null);
+      setGlucagenData(null);
+      setSparepenLongTermData(null);
+      setSparepenMealData(null);
+      setTransmitterData(null);
       return null;
     }
     const latestDoc = querySnapshot.docs[0];
 
-    console.log(latestDoc.data().insulin);
-    console.log(latestDoc.data().needle);
-    console.log(latestDoc.data().sensor);
-
     setIntervalDataInsulin(latestDoc.data().insulin);
     setIntervalDataNeedle(latestDoc.data().needle);
     setIntervalDataSensor(latestDoc.data().sensor);
+    setIntervalDataGlucaGen(latestDoc.data().glucagen);
+    setIntervalDataSparepenLongTerm(latestDoc.data().sparepenlongterm);
+    setIntervalDataSparepenMeal(latestDoc.data().sparepenmeal);
+    setIntervalDataTransmitter(latestDoc.data().transmitter);
     setUserName(latestDoc.data().Namn);
     dispatch({ type: "CHANGE_INSULIN", payload: latestDoc.data().insulin });
     dispatch({ type: "CHANGE_NEEDLE", payload: latestDoc.data().needle });
     dispatch({ type: "CHANGE_SENSOR", payload: latestDoc.data().sensor });
+
+    dispatch({ type: "CHANGE_GLUCAGEN", payload: latestDoc.data().glucagen });
+    dispatch({
+      type: "CHANGE_SPAREPENLONGTERM",
+      payload: latestDoc.data().sparepenlongterm,
+    });
+    dispatch({
+      type: "CHANGE_SPAREPENMEAL",
+      payload: latestDoc.data().sparepenmeal,
+    });
+    dispatch({
+      type: "CHANGE_TRANSMITTER",
+      payload: latestDoc.data().transmitter,
+    });
+
     return latestDoc.data();
   };
 
@@ -171,6 +240,8 @@ const index = () => {
   const addChanges = async (userId, changeType, date) => {
     let fixDate = moment(date, "dddd, Do MMMM , HH:mm").format("L");
     let fixTime = moment(date, "dddd, Do MMMM , HH:mm").format("LT");
+
+    console.log("spara", date);
 
     const docRef = await addDoc(collection(db, "changes"), {
       changeType: changeType,
@@ -228,21 +299,169 @@ const index = () => {
     }
   };
 
+  const onChangeGlucagen = (event, selectedDate) => {
+    setShowGlucaGenDateTime(false);
+    if (event.type === "set") {
+      const _glucagenDate = addRegDays(selectedDate, intervalDataGlucaGen);
+
+      let dateTimeStr = _glucagenDate;
+      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextGlucaGenColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
+      setGlucagenData(updatedDateTimeStr);
+      saveGlucagenData(updatedDateTimeStr);
+    }
+  };
+
+  const onChangeSparePenLongTerm = (event, selectedDate) => {
+    setShowSparepenLongTermDateTime(false);
+    if (event.type === "set") {
+      const _sparepenLongTermDate = addRegDays(
+        selectedDate,
+        intervalDataSparepenLongTerm
+      );
+
+      let dateTimeStr = _sparepenLongTermDate;
+      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextSparepenLongTermColor(
+        isDataAfter(updatedDateTimeStr) ? "red" : "black"
+      );
+      setSparepenLongTermData(updatedDateTimeStr);
+      saveSparepenlongtermData(updatedDateTimeStr);
+    }
+  };
+
+  const onChangeSparepenMeal = (event, selectedDate) => {
+    setShowSparepenMealDateTime(false);
+    if (event.type === "set") {
+      const _sparepenMealDate = addRegDays(
+        selectedDate,
+        intervalDataSparepenMeal
+      );
+
+      let dateTimeStr = _sparepenMealDate;
+      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextSparepenMealColor(
+        isDataAfter(updatedDateTimeStr) ? "red" : "black"
+      );
+      setSparepenMealData(updatedDateTimeStr);
+      saveSparepenmealData(updatedDateTimeStr);
+    }
+  };
+
+  const onChangeTransmitter = (event, selectedDate) => {
+    setShowTransmitterDateTime(false);
+    if (event.type === "set") {
+      const _transmitterDate = addRegDays(
+        selectedDate,
+        intervalDataTransmitter
+      );
+
+      let dateTimeStr = _transmitterDate;
+      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+      setTextTransmitterColor(
+        isDataAfter(updatedDateTimeStr) ? "red" : "black"
+      );
+      setTransmitterData(updatedDateTimeStr);
+      saveTransmitterData(updatedDateTimeStr);
+    }
+  };
+
   const showMode = (currentMode, index) => {
+    // if (index === 0) {
+    //   setShowInsulinDateTime(true);
+    //   setShowSensorDateTime(false);
+    //   setShowNeelDateTime(false);
+    //   setShowGlucaGenDateTime(false);
+    //   setShowSparepenLongTermDateTime(false);
+    //   setShowSparepenMealDateTime(false);
+    //   setShowTransmitterDateTime(false);
+    // }
+    // if (index === 1) {
+    //   setShowSensorDateTime(true);
+    //   setShowNeelDateTime(false);
+    //   setShowInsulinDateTime(false);
+    // }
+    // if (index === 2) {
+    //   setShowNeelDateTime(true);
+    //   setShowSensorDateTime(false);
+    //   setShowInsulinDateTime(false);
+    // }
+
+    // Första if-satsen: index 0
     if (index === 0) {
       setShowInsulinDateTime(true);
       setShowSensorDateTime(false);
       setShowNeelDateTime(false);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(false);
     }
+
+    // Andra if-satsen: index 1
     if (index === 1) {
+      setShowInsulinDateTime(false);
       setShowSensorDateTime(true);
       setShowNeelDateTime(false);
-      setShowInsulinDateTime(false);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(false);
     }
+
+    // Tredje if-satsen: index 2
     if (index === 2) {
-      setShowNeelDateTime(true);
-      setShowSensorDateTime(false);
       setShowInsulinDateTime(false);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(true);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(false);
+    }
+
+    // Fjärde if-satsen: index 3
+    if (index === 3) {
+      setShowInsulinDateTime(false);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
+      setShowGlucaGenDateTime(true);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(false);
+    }
+
+    // Femte if-satsen: index 4
+    if (index === 4) {
+      setShowInsulinDateTime(false);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(true);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(false);
+    }
+
+    // Sjätte if-satsen: index 5
+    if (index === 5) {
+      setShowInsulinDateTime(false);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(true);
+      setShowTransmitterDateTime(false);
+    }
+
+    // Sjätte if-satsen: index 5
+    if (index === 6) {
+      setShowInsulinDateTime(false);
+      setShowSensorDateTime(false);
+      setShowNeelDateTime(false);
+      setShowGlucaGenDateTime(false);
+      setShowSparepenLongTermDateTime(false);
+      setShowSparepenMealDateTime(false);
+      setShowTransmitterDateTime(true);
     }
 
     setMode(currentMode);
@@ -270,6 +489,22 @@ const index = () => {
     addChanges(uniqueDokumentId, "Sensor", sensorDatum);
   };
 
+  const saveGlucagenData = async (glucagenDatum) => {
+    addChanges(uniqueDokumentId, "GlucaGen", glucagenDatum);
+  };
+
+  const saveSparepenlongtermData = async (sparepenlongtermDatum) => {
+    addChanges(uniqueDokumentId, "SparePenLongTerm", sparepenlongtermDatum);
+  };
+
+  const saveSparepenmealData = async (sparepenmealDatum) => {
+    addChanges(uniqueDokumentId, "SparePenMeal", sparepenmealDatum);
+  };
+
+  const saveTransmitterData = async (transmitterDatum) => {
+    addChanges(uniqueDokumentId, "Transmitter", transmitterDatum);
+  };
+
   const isDataAfter = (data) => {
     if (
       moment(
@@ -288,13 +523,29 @@ const index = () => {
     setShowInsulinDateTime(false);
     setShowSensorDateTime(false);
     setShowNeelDateTime(false);
+    setShowGlucaGenDateTime(false);
+    setShowSparepenLongTermDateTime(false);
+    setShowSparepenMealDateTime(false);
+    setShowTransmitterDateTime(false);
     try {
-      const [needleDataResponse, sensorDataResponse, insulinDataResponse] =
-        await Promise.all([
-          listLatestChange(uniqueDokumentId, "Needle"),
-          listLatestChange(uniqueDokumentId, "Sensor"),
-          listLatestChange(uniqueDokumentId, "Insulin"),
-        ]);
+      const [
+        needleDataResponse,
+        sensorDataResponse,
+        insulinDataResponse,
+        glucagenDataResponse,
+        sparepenLongTermDataResponse,
+        sparepenMealDataResponse,
+        transmitterDataResponse,
+      ] = await Promise.all([
+        listLatestChange(uniqueDokumentId, "Needle"),
+        listLatestChange(uniqueDokumentId, "Sensor"),
+        listLatestChange(uniqueDokumentId, "Insulin"),
+
+        listLatestChange(uniqueDokumentId, "Glucagen"),
+        listLatestChange(uniqueDokumentId, "SparePenLongTerm"),
+        listLatestChange(uniqueDokumentId, "SparePenMeal"),
+        listLatestChange(uniqueDokumentId, "Transmitter"),
+      ]);
 
       if (needleDataResponse) {
         const needleDateFix =
@@ -323,6 +574,53 @@ const index = () => {
         setInsulinData(isulinRes);
         setTextInsulinColor(isDataAfter(isulinRes) ? "red" : "black");
       }
+
+      if (glucagenDataResponse) {
+        const glucagenDateFix =
+          glucagenDataResponse.dateChanged +
+          " " +
+          glucagenDataResponse.timeChanged;
+        const glucagenRes = moment(glucagenDateFix).format(
+          "dddd, Do MMMM , HH:mm"
+        );
+        setGlucagenData(glucagenRes);
+        setTextGlucaGenColor(isDataAfter(glucagenRes) ? "red" : "black");
+      }
+
+      if (sparepenLongTermDataResponse) {
+        const sparepenLongTermDateFix =
+          sparepenLongTermDataResponse.dateChanged +
+          " " +
+          sparepenLongTermDataResponse.timeChanged;
+        const sparepenLongTermRes = moment(sparepenLongTermDateFix).format(
+          "dddd, Do MMMM , HH:mm"
+        );
+        setSparepenLongTermData(sparepenLongTermRes);
+        setTextSparepenLongTermColor(
+          isDataAfter(sparepenLongTermRes) ? "red" : "black"
+        );
+      }
+
+      if (sparepenMealDataResponse) {
+        const fix =
+          sparepenMealDataResponse.dateChanged +
+          " " +
+          sparepenMealDataResponse.timeChanged;
+        const res = moment(fix).format("dddd, Do MMMM , HH:mm");
+
+        setSparepenMealData(res);
+        setTextSparepenMealColor(isDataAfter(res) ? "red" : "black");
+      }
+
+      if (transmitterDataResponse) {
+        const fix =
+          transmitterDataResponse.dateChanged +
+          " " +
+          transmitterDataResponse.timeChanged;
+        const res = moment(fix).format("dddd, Do MMMM , HH:mm");
+        setTransmitterData(res);
+        setTextTransmitterColor(isDataAfter(res) ? "red" : "black");
+      }
     } catch (error) {
       alert("Fel vid hämtning av data.");
     }
@@ -350,9 +648,42 @@ const index = () => {
     saveSensorData(_sensordate);
   };
 
+  const onPressGlucagen = (date) => {
+    const _date = addRegDays(date, intervalDataGlucaGen);
+    setTextGlucaGenColor(isDataAfter(_date) ? "red" : "black");
+    setShowGlucaGenDateTime(false);
+    setGlucagenData(_date);
+    saveGlucagenData(_date);
+  };
+
+  const onPressSparePenLongTerm = (date) => {
+    const _date = addRegDays(date, intervalDataSparepenLongTerm);
+    setTextGlucaGenColor(isDataAfter(_date) ? "red" : "black");
+    setShowSparepenLongTermDateTime(false);
+    setSparepenLongTermData(_date);
+    saveSparepenlongtermData(_date);
+  };
+
+  const onPressSparePenMeal = (date) => {
+    const _date = addRegDays(date, intervalDataSparepenMeal);
+    console.log("_date", _date);
+    setTextSparepenMealColor(isDataAfter(_date) ? "red" : "black");
+    setShowSparepenMealDateTime(false);
+    setSparepenMealData(_date);
+    saveSparepenmealData(_date);
+  };
+
+  const onPressTransmitter = (date) => {
+    const _date = addRegDays(date, intervalDataTransmitter);
+    setTextTransmitterColor(isDataAfter(_date) ? "red" : "black");
+    setShowTransmitterDateTime(false);
+    setTransmitterData(_date);
+    saveTransmitterData(_date);
+  };
+
   return (
     <SafeAreaView className="flex-1  bg-[#74cdcd]">
-      <View className="flex-row p-1">
+      <View className="flex-row mr-3 ml-3">
         <View>
           <Link
             href={{
@@ -391,9 +722,17 @@ const index = () => {
           showInsulinDateTime={showInsulinDateTime}
           showSensorDateTime={showSensorDateTime}
           showNeelDateTime={showNeelDateTime}
+          showGlucaGenDateTime={showGlucaGenDateTime}
+          showSparepenLongTermDateTime={showSparepenLongTermDateTime}
+          showSparepenMealDateTime={showSparepenMealDateTime}
+          showTransmitterDateTime={showTransmitterDateTime}
           onChangeInsulin={onChangeInsulin}
           onChangeSensor={onChangeSensor}
           onChangeNeel={onChangeNeel}
+          onChangeGlucagen={onChangeGlucagen}
+          onChangeSparePenLongTerm={onChangeSparePenLongTerm}
+          onChangeSparepenMeal={onChangeSparepenMeal}
+          onChangeTransmitter={onChangeTransmitter}
           date={date}
           mode={mode}
         />
@@ -423,35 +762,35 @@ const index = () => {
             />
           </View>
           <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
-            <InsulinRegistration
-              onPressInsulin={onPressInsulin}
+            <SparePenMealRegistration
+              onPressSparePenMeal={onPressSparePenMeal}
               showDatepicker={showDatepicker}
-              textInsulinColor={textInsulinColor}
-              insulinData={insulinData}
+              textSparepenMealColor={textSparepenMealColor}
+              sparepenMealData={sparepenMealData}
             />
           </View>
           <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
-            <NeedleRegistration
-              onPressNeedle={onPressNeedle}
+            <SparePenLongTermRegistration
+              onPressSparePenLongTerm={onPressSparePenLongTerm}
               showDatepicker={showDatepicker}
-              textNeedleColor={textNeedleColor}
-              needleData={needleData}
+              textSparepenLongTermColor={textSparepenLongTermColor}
+              sparepenLongTermData={sparepenLongTermData}
             />
           </View>
           <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
-            <SensorRegistration
-              onPressSensor={onPressSensor}
+            <TransmitterRegistration
+              onPressTransmitter={onPressTransmitter}
               showDatepicker={showDatepicker}
-              textSensorColor={textSensorColor}
-              sensorData={sensorData}
+              textTransmitterColor={textTransmitterColor}
+              transmitterData={transmitterData}
             />
           </View>
           <View className="bg-[#143642] rounded-xl" style={{ height: 200 }}>
-            <SensorRegistration
-              onPressSensor={onPressSensor}
+            <GlucagenRegistration
+              onPressGlucagen={onPressGlucagen}
               showDatepicker={showDatepicker}
-              textSensorColor={textSensorColor}
-              sensorData={sensorData}
+              textGlucaGenColor={textGlucaGenColor}
+              glucagenData={glucagenData}
             />
           </View>
         </View>

@@ -5,9 +5,17 @@ const ShowInsulineDateTime = ({
   showInsulinDateTime,
   showSensorDateTime,
   showNeelDateTime,
+  showGlucaGenDateTime,
+  showSparepenLongTermDateTime,
+  showSparepenMealDateTime,
+  showTransmitterDateTime,
   onChangeInsulin,
   onChangeSensor,
   onChangeNeel,
+  onChangeGlucagen,
+  onChangeSparePenLongTerm,
+  onChangeSparepenMeal,
+  onChangeTransmitter,
   date,
   mode,
 }) => {
@@ -56,6 +64,70 @@ const ShowInsulineDateTime = ({
                 mode={mode}
                 is24Hour={true}
                 onChange={onChangeNeel}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+              />
+            </View>
+          </View>
+        </View>
+      )}
+      {showGlucaGenDateTime && (
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
+          <View>
+            <View>
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                onChange={onChangeGlucagen}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+              />
+            </View>
+          </View>
+        </View>
+      )}
+      {showSparepenLongTermDateTime && (
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
+          <View>
+            <View>
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                onChange={onChangeSparePenLongTerm}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+              />
+            </View>
+          </View>
+        </View>
+      )}
+      {showSparepenMealDateTime && (
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
+          <View>
+            <View>
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                onChange={onChangeSparepenMeal}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+              />
+            </View>
+          </View>
+        </View>
+      )}
+      {showTransmitterDateTime && (
+        <View className="m-2 items-center justify-center bg-[#3d9a9c] rounded-xl">
+          <View>
+            <View>
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                onChange={onChangeTransmitter}
                 display={Platform.OS === "ios" ? "inline" : "default"}
               />
             </View>
