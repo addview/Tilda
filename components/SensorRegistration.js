@@ -43,7 +43,7 @@ const SensorRegistration = ({
           }}
         >
           {sensorData === null ? (
-            <ActivityIndicator size="large" color="#20696a" />
+            <ActivityIndicator size="small" color="#fff" />
           ) : (
             sensorData
           )}

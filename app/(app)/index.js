@@ -76,14 +76,14 @@ const index = () => {
   const [uniqueDokumentId, setUniqueDokumentId] = useState(null);
   const [userName, setUserName] = useState(null);
 
-  const [textInsulinColor, setTextInsulinColor] = useState("black");
-  const [textNeedleColor, setTextNeedleColor] = useState("black");
-  const [textSensorColor, setTextSensorColor] = useState("black");
-  const [textTransmitterColor, setTextTransmitterColor] = useState("black");
+  const [textInsulinColor, setTextInsulinColor] = useState("#eda034");
+  const [textNeedleColor, setTextNeedleColor] = useState("#eda034");
+  const [textSensorColor, setTextSensorColor] = useState("#eda034");
+  const [textTransmitterColor, setTextTransmitterColor] = useState("#eda034");
   const [textSparepenLongTermColor, setTextSparepenLongTermColor] =
-    useState("black");
-  const [textSparepenMealColor, setTextSparepenMealColor] = useState("black");
-  const [textGlucaGenColor, setTextGlucaGenColor] = useState("black");
+    useState("#eda034");
+  const [textSparepenMealColor, setTextSparepenMealColor] = useState("#eda034");
+  const [textGlucaGenColor, setTextGlucaGenColor] = useState("#eda034");
 
   useEffect(() => {
     const executeAsyncFunctions = async () => {
@@ -237,16 +237,18 @@ const index = () => {
     return latestDoc.data();
   };
 
-  const addChanges = async (userId, changeType, date) => {
-    let fixDate = moment(date, "dddd, Do MMMM , HH:mm").format("L");
-    let fixTime = moment(date, "dddd, Do MMMM , HH:mm").format("LT");
+  const handleSwedishDate = (date) => {
+    return moment(date).format("YYYY-MM-DD HH:mm");
+  };
 
-    console.log("spara", date);
+  const addChanges = async (userId, changeType, date) => {
+    // Dela upp det formaterade datumet i datum och klockslag
+    let [datePart, timePart] = date.split(" ");
 
     const docRef = await addDoc(collection(db, "changes"), {
       changeType: changeType,
-      dateChanged: fixDate,
-      timeChanged: fixTime,
+      dateChanged: datePart,
+      timeChanged: timePart,
       timestamp: moment().valueOf(),
       userId: userId,
     });
@@ -261,22 +263,28 @@ const index = () => {
   }
 
   const onChangeInsulin = (event, selectedDate) => {
-    setShowInsulinDateTime(false);
-    if (event.type === "set") {
-      const _insulinDate = addRegDays(selectedDate, intervalDataInsulin);
+    try {
+      let fixDate = handleSwedishDate(selectedDate);
 
-      let dateTimeStr = _insulinDate;
-      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
-      setTextInsulinColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
-      setInsulinData(updatedDateTimeStr);
-      saveInsulinData(updatedDateTimeStr);
+      setShowInsulinDateTime(false);
+      if (event.type === "set") {
+        let _insulinDate = addRegDays(fixDate, intervalDataInsulin);
+        let updatedDateTimeStr = changeTimeToNoon(_insulinDate);
+
+        setTextInsulinColor(isDataAfter(updatedDateTimeStr) ? "red" : "black");
+        setInsulinData(updatedDateTimeStr);
+        saveInsulinData(updatedDateTimeStr);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const onChangeSensor = (event, selectedDate) => {
+    let fixDate = handleSwedishDate(selectedDate);
     setShowSensorDateTime(false);
     if (event.type === "set") {
-      const _sensorDate = addRegDays(selectedDate, intervalDataSensor);
+      const _sensorDate = addRegDays(fixDate, intervalDataSensor);
 
       let dateTimeStr = _sensorDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
@@ -287,9 +295,10 @@ const index = () => {
   };
 
   const onChangeNeel = (event, selectedDate) => {
+    let fixDate = handleSwedishDate(selectedDate);
     setShowNeelDateTime(false);
     if (event.type === "set") {
-      const _neelDate = addRegDays(selectedDate, intervalDataNeedle);
+      const _neelDate = addRegDays(fixDate, intervalDataNeedle);
 
       let dateTimeStr = _neelDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
@@ -300,9 +309,10 @@ const index = () => {
   };
 
   const onChangeGlucagen = (event, selectedDate) => {
+    let fixDate = handleSwedishDate(selectedDate);
     setShowGlucaGenDateTime(false);
     if (event.type === "set") {
-      const _glucagenDate = addRegDays(selectedDate, intervalDataGlucaGen);
+      const _glucagenDate = addRegDays(fixDate, intervalDataGlucaGen);
 
       let dateTimeStr = _glucagenDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
@@ -313,30 +323,33 @@ const index = () => {
   };
 
   const onChangeSparePenLongTerm = (event, selectedDate) => {
-    setShowSparepenLongTermDateTime(false);
-    if (event.type === "set") {
-      const _sparepenLongTermDate = addRegDays(
-        selectedDate,
-        intervalDataSparepenLongTerm
-      );
+    try {
+      let fixDate = handleSwedishDate(selectedDate);
+      setShowSparepenLongTermDateTime(false);
+      if (event.type === "set") {
+        const _sparepenLongTermDate = addRegDays(
+          fixDate,
+          intervalDataSparepenLongTerm
+        );
 
-      let dateTimeStr = _sparepenLongTermDate;
-      let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
-      setTextSparepenLongTermColor(
-        isDataAfter(updatedDateTimeStr) ? "red" : "black"
-      );
-      setSparepenLongTermData(updatedDateTimeStr);
-      saveSparepenlongtermData(updatedDateTimeStr);
+        let dateTimeStr = _sparepenLongTermDate;
+        let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
+        setTextSparepenLongTermColor(
+          isDataAfter(updatedDateTimeStr) ? "red" : "black"
+        );
+        setSparepenLongTermData(updatedDateTimeStr);
+        saveSparepenlongtermData(updatedDateTimeStr);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const onChangeSparepenMeal = (event, selectedDate) => {
+    let fixDate = handleSwedishDate(selectedDate);
     setShowSparepenMealDateTime(false);
     if (event.type === "set") {
-      const _sparepenMealDate = addRegDays(
-        selectedDate,
-        intervalDataSparepenMeal
-      );
+      const _sparepenMealDate = addRegDays(fixDate, intervalDataSparepenMeal);
 
       let dateTimeStr = _sparepenMealDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
@@ -349,12 +362,10 @@ const index = () => {
   };
 
   const onChangeTransmitter = (event, selectedDate) => {
+    let fixDate = handleSwedishDate(selectedDate);
     setShowTransmitterDateTime(false);
     if (event.type === "set") {
-      const _transmitterDate = addRegDays(
-        selectedDate,
-        intervalDataTransmitter
-      );
+      const _transmitterDate = addRegDays(fixDate, intervalDataTransmitter);
 
       let dateTimeStr = _transmitterDate;
       let updatedDateTimeStr = changeTimeToNoon(dateTimeStr);
@@ -474,7 +485,12 @@ const index = () => {
   moment.locale("sv");
 
   const addRegDays = (date, days) => {
-    return moment(date).add(days, "days").format("dddd, Do MMMM , HH:mm");
+    let formattedDate = moment(date)
+      .add(days, "days")
+      .format("YYYY-MM-DD HH:mm");
+
+    console.log(formattedDate);
+    return formattedDate;
   };
 
   const saveInsulinData = async (insulinDatum) => {
@@ -507,10 +523,8 @@ const index = () => {
 
   const isDataAfter = (data) => {
     if (
-      moment(
-        moment(moment(), "dddd, Do MMMM , HH:mm").format("YYYY-MM-DD HH:mm")
-      ).isAfter(
-        moment(data, "dddd, Do MMMM , HH:mm").format("YYYY-MM-DD HH:mm")
+      moment(moment(moment()).format("YYYY-MM-DD HH:mm")).isAfter(
+        moment(data).format("YYYY-MM-DD HH:mm")
       )
     ) {
       return true;
@@ -541,7 +555,7 @@ const index = () => {
         listLatestChange(uniqueDokumentId, "Sensor"),
         listLatestChange(uniqueDokumentId, "Insulin"),
 
-        listLatestChange(uniqueDokumentId, "Glucagen"),
+        listLatestChange(uniqueDokumentId, "GlucaGen"),
         listLatestChange(uniqueDokumentId, "SparePenLongTerm"),
         listLatestChange(uniqueDokumentId, "SparePenMeal"),
         listLatestChange(uniqueDokumentId, "Transmitter"),
@@ -550,7 +564,7 @@ const index = () => {
       if (needleDataResponse) {
         const needleDateFix =
           needleDataResponse.dateChanged + " " + needleDataResponse.timeChanged;
-        const needleRes = moment(needleDateFix).format("dddd, Do MMMM , HH:mm");
+        const needleRes = moment(needleDateFix).format("YYYY-MM-DD HH:mm");
         setNeedleData(needleRes);
         setTextNeedleColor(isDataAfter(needleRes) ? "red" : "black");
       }
@@ -558,7 +572,7 @@ const index = () => {
       if (sensorDataResponse) {
         const sensorDateFix =
           sensorDataResponse.dateChanged + " " + sensorDataResponse.timeChanged;
-        const sensorRes = moment(sensorDateFix).format("dddd, Do MMMM , HH:mm");
+        const sensorRes = moment(sensorDateFix).format("YYYY-MM-DD HH:mm");
         setSensorData(sensorRes);
         setTextSensorColor(isDataAfter(sensorRes) ? "red" : "black");
       }
@@ -568,9 +582,7 @@ const index = () => {
           insulinDataResponse.dateChanged +
           " " +
           insulinDataResponse.timeChanged;
-        const isulinRes = moment(insulinDateFix).format(
-          "dddd, Do MMMM , HH:mm"
-        );
+        const isulinRes = moment(insulinDateFix).format("YYYY-MM-DD HH:mm");
         setInsulinData(isulinRes);
         setTextInsulinColor(isDataAfter(isulinRes) ? "red" : "black");
       }
@@ -580,9 +592,7 @@ const index = () => {
           glucagenDataResponse.dateChanged +
           " " +
           glucagenDataResponse.timeChanged;
-        const glucagenRes = moment(glucagenDateFix).format(
-          "dddd, Do MMMM , HH:mm"
-        );
+        const glucagenRes = moment(glucagenDateFix).format("YYYY-MM-DD HH:mm");
         setGlucagenData(glucagenRes);
         setTextGlucaGenColor(isDataAfter(glucagenRes) ? "red" : "black");
       }
@@ -593,8 +603,11 @@ const index = () => {
           " " +
           sparepenLongTermDataResponse.timeChanged;
         const sparepenLongTermRes = moment(sparepenLongTermDateFix).format(
-          "dddd, Do MMMM , HH:mm"
+          "YYYY-MM-DD HH:mm"
         );
+
+        console.log("ffffffff", sparepenLongTermRes);
+
         setSparepenLongTermData(sparepenLongTermRes);
         setTextSparepenLongTermColor(
           isDataAfter(sparepenLongTermRes) ? "red" : "black"
@@ -606,7 +619,7 @@ const index = () => {
           sparepenMealDataResponse.dateChanged +
           " " +
           sparepenMealDataResponse.timeChanged;
-        const res = moment(fix).format("dddd, Do MMMM , HH:mm");
+        const res = moment(fix).format("YYYY-MM-DD HH:mm");
 
         setSparepenMealData(res);
         setTextSparepenMealColor(isDataAfter(res) ? "red" : "black");
@@ -617,7 +630,7 @@ const index = () => {
           transmitterDataResponse.dateChanged +
           " " +
           transmitterDataResponse.timeChanged;
-        const res = moment(fix).format("dddd, Do MMMM , HH:mm");
+        const res = moment(fix).format("YYYY-MM-DD HH:mm");
         setTransmitterData(res);
         setTextTransmitterColor(isDataAfter(res) ? "red" : "black");
       }
@@ -658,7 +671,7 @@ const index = () => {
 
   const onPressSparePenLongTerm = (date) => {
     const _date = addRegDays(date, intervalDataSparepenLongTerm);
-    setTextGlucaGenColor(isDataAfter(_date) ? "red" : "black");
+    setTextSparepenLongTermColor(isDataAfter(_date) ? "red" : "black");
     setShowSparepenLongTermDateTime(false);
     setSparepenLongTermData(_date);
     saveSparepenlongtermData(_date);

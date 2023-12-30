@@ -28,9 +28,7 @@ const SparePenMealRegistration = ({
                 size={24}
                 color="white"
               />
-              <Text className="text-xl font-normal text-white">
-                Måltidsinsulin
-              </Text>
+              <Text className="text-xl font-normal text-white">Måltid</Text>
             </TouchableOpacity>
           </View>
           <View style={{ flex: 3 }} className="justify-center items-center">
@@ -54,7 +52,7 @@ const SparePenMealRegistration = ({
           }}
         >
           {sparepenMealData === null ? (
-            <ActivityIndicator size="large" color="#20696a" />
+            <ActivityIndicator size="small" color="#fff" />
           ) : (
             sparepenMealData
           )}

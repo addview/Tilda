@@ -48,7 +48,7 @@ const InsulinRegistration = ({
           }}
         >
           {insulinData === null ? (
-            <ActivityIndicator size="large" color="#20696a" />
+            <ActivityIndicator size="small" color="#fff" />
           ) : (
             insulinData
           )}
