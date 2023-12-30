@@ -13,6 +13,7 @@ const InsulinRegistration = ({
   textInsulinColor,
   insulinData,
 }) => {
+  let fixdate = moment(insulinData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -50,7 +51,7 @@ const InsulinRegistration = ({
           {insulinData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            insulinData
+            fixdate
           )}
         </Text>
       </View>

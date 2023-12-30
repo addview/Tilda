@@ -8,6 +8,7 @@ const TransmitterRegistration = ({
   textTransmitterColor,
   transmitterData,
 }) => {
+  let fixdate = moment(transmitterData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -51,7 +52,7 @@ const TransmitterRegistration = ({
           {transmitterData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            transmitterData
+            fixdate
           )}
         </Text>
       </View>

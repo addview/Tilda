@@ -8,6 +8,9 @@ const SparePenLongTermRegistration = ({
   textSparepenLongTermColor,
   sparepenLongTermData,
 }) => {
+  let fixdate = moment(sparepenLongTermData).format(
+    "dddd, Do MMMM, [kl.]HH:mm"
+  );
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -45,7 +48,7 @@ const SparePenLongTermRegistration = ({
           {sparepenLongTermData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            sparepenLongTermData
+            fixdate
           )}
         </Text>
       </View>

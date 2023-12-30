@@ -53,7 +53,6 @@ export function useStorageState(key) {
   // Set
   const setValue = React.useCallback(
     (value) => {
-      console.log("synk", value);
       setStorageItemAsync(key, value).then(() => {
         setState(value);
       });

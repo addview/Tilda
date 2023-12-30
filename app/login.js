@@ -30,7 +30,6 @@ const login = () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       const dd = await signingIn(response.user.email);
-      console.log("dd", session);
     } catch (error) {
       console.log(error);
     } finally {

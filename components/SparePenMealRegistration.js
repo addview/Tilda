@@ -13,6 +13,7 @@ const SparePenMealRegistration = ({
   textSparepenMealColor,
   sparepenMealData,
 }) => {
+  let fixdate = moment(sparepenMealData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -54,7 +55,7 @@ const SparePenMealRegistration = ({
           {sparepenMealData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            sparepenMealData
+            fixdate
           )}
         </Text>
       </View>

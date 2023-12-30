@@ -8,6 +8,7 @@ const NeedleRegistration = ({
   textNeedleColor,
   needleData,
 }) => {
+  let fixdate = moment(needleData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -45,7 +46,7 @@ const NeedleRegistration = ({
           {needleData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            needleData
+            fixdate
           )}
         </Text>
       </View>

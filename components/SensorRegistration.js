@@ -8,6 +8,7 @@ const SensorRegistration = ({
   textSensorColor,
   sensorData,
 }) => {
+  let fixdate = moment(sensorData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -45,7 +46,7 @@ const SensorRegistration = ({
           {sensorData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            sensorData
+            fixdate
           )}
         </Text>
       </View>

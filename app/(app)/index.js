@@ -606,8 +606,6 @@ const index = () => {
           "YYYY-MM-DD HH:mm"
         );
 
-        console.log("ffffffff", sparepenLongTermRes);
-
         setSparepenLongTermData(sparepenLongTermRes);
         setTextSparepenLongTermColor(
           isDataAfter(sparepenLongTermRes) ? "red" : "black"

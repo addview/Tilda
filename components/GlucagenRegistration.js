@@ -8,6 +8,7 @@ const GlucagenRegistration = ({
   textGlucaGenColor,
   glucagenData,
 }) => {
+  let fixdate = moment(glucagenData).format("dddd, Do MMMM, [kl.]HH:mm");
   return (
     <>
       <View style={{ flex: 2 }}>
@@ -47,7 +48,7 @@ const GlucagenRegistration = ({
           {glucagenData === null ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            glucagenData
+            fixdate
           )}
         </Text>
       </View>

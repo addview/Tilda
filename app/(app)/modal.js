@@ -26,8 +26,6 @@ export default function Modal({ params }) {
   const [intervalDataNeedle, setIntervalDataNeedle] = useState(null);
   const [intervalDataSensor, setIntervalDataSensor] = useState(null);
 
-  console.log(router.params);
-
   return (
     <SafeAreaView className=" bg-[#74cdcd]" style={{ flex: 1 }}>
       <ScrollView

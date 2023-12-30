@@ -91,7 +91,6 @@ export default function interval() {
     setIntervalDataInsulin(parseInt(state.insulin));
 
     setTargetEmail(params.email);
-    console.log(params.email);
   }, []);
 
   useEffect(() => {
