@@ -71,7 +71,7 @@ const login = () => {
             source={require("../assets/login.png")}
             contentFit="contain"
           />
-          <Text className="text-4xl font-normal text-white">Singelvisa</Text>
+          <Text className="text-4xl font-normal text-white">Astemelia</Text>
         </View>
 
         <View className="flex flex-col w-full p-4 ">

@@ -718,7 +718,7 @@ const index = () => {
         </View>
         <View className="grow items-center ">
           <Text className="text-2xl font-bold text-white">
-            {userName === null ? "Singelvisa" : "Anv. " + userName}
+            {userName === null ? "Astemelia" : "Anv. " + userName}
           </Text>
         </View>
         <View className="flex-none mr-1">
