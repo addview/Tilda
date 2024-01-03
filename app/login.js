@@ -16,6 +16,7 @@ import { useSession } from "../context/Ctx";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const login = () => {
   const [email, setEmail] = useState("");
@@ -62,63 +63,65 @@ const login = () => {
   }, [session]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-[#20696a] justify-center ">
-      <View className="justify-center items-center ">
+    <SafeAreaView className="bg-[#74cdcd] flex-1 ">
+      <View className="mt-16 items-center">
         <View className="items-center">
+          <Text className="text-4xl font-normal text-white">Astemelia</Text>
           <Image
-            style={{ height: 100, width: 100 }}
+            style={{ height: 50, width: 100 }}
             className="flex"
-            source={require("../assets/login.png")}
+            source={require("../assets/knut.png")}
             contentFit="contain"
           />
-          <Text className="text-4xl font-normal text-white">Astemelia</Text>
         </View>
 
-        <View className="flex flex-col w-full p-4 ">
+        <View className="flex flex-col w-full p-6 mt-4 ">
           <KeyboardAvoidingView behavior="padding">
-            <TextInput
-              onChangeText={(text) => setEmail(text)}
-              placeholder="Ange din email"
-              className="h-10 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
-            />
-            <TextInput
-              secureTextEntry={true}
-              onChangeText={(text) => setPassword(text)}
-              placeholder="Ange ditt lösenord"
-              className="mt-2 h-10 p-2 rounded-lg font-semibold border-solid border-2  bg-[#74cdcd] text-white"
-            />
+            <View className="pl-2 pr-2 gap-y-4">
+              <TextInput
+                onChangeText={(text) => setEmail(text)}
+                placeholder="Ange din email"
+                className="h-10 p-2 rounded-md font-semibold    bg-[#5db9b9] text-white"
+              />
+              <TextInput
+                secureTextEntry={true}
+                onChangeText={(text) => setPassword(text)}
+                placeholder="Ange ditt lösenord"
+                className="mt-2 h-10 p-2 rounded-md font-semibold   bg-[#5db9b9] text-white"
+              />
+            </View>
 
-            {loading ? (
-              <ActivityIndicator
-                className="flex"
-                size="large"
-                color="#fff"
-              ></ActivityIndicator>
-            ) : (
-              <View className="flex flex-row-reverse   mt-2">
-                <TouchableOpacity
-                  className="bg-[#eda034]   rounded-md py-1 px-2"
-                  onPress={signIn}
-                >
-                  <View className="flex flex-row items-center justify-center ">
-                    <Text className="text-xl  text-black font-normal">
+            <View className="flex p-2 mt-4 ">
+              <TouchableOpacity
+                className="bg-[#eda034]   rounded-md py-1 px-2"
+                onPress={signIn}
+              >
+                <View className="flex flex-row items-center justify-center p-1">
+                  {loading ? (
+                    <ActivityIndicator
+                      className="flex"
+                      size="large"
+                      color="#fff"
+                    ></ActivityIndicator>
+                  ) : (
+                    <Text className="text-lg  text-white font-normal">
                       Logga in
                     </Text>
-                  </View>
-                </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                  className="bg-[#eda034] mr-2 space-x-2 rounded-md py-1 px-2"
-                  onPress={signUp}
-                >
-                  <View className="flex flex-row items-center justify-center">
-                    <Text className="text-xl text-black font-normal">
-                      Skapa konto
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
+              <TouchableOpacity
+                className=" mr-2 space-x-2 rounded-md py-1 px-2"
+                onPress={signUp}
+              >
+                <View className="flex flex-row items-center justify-center pt-2">
+                  <Text className="text-md text-white font-normal underline">
+                    Skapa konto
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </KeyboardAvoidingView>
         </View>
       </View>
