@@ -37,7 +37,7 @@ const db = FIREBASE_DB;
 
 const index = () => {
   const { state, dispatch } = useContext(store);
-  const { session, signOut, isLoading } = useSession();
+  const { session } = useSession();
 
   const [insulinData, setInsulinData] = useState(null);
   const [needleData, setNeedleData] = useState(null);
@@ -140,12 +140,14 @@ const index = () => {
     }
   }, [uniqueDokumentId]);
 
-  useEffect(() => {
-    if (state.changeinterval) {
-      fetchData();
-      getUserIntervall(session); // Och sist denna
-    }
-  }, []);
+  //Denna verkar vi inte behöva
+  // useEffect(() => {
+  //   console.log("vvvvvv");
+  //   if (state.changeinterval) {
+  //     fetchData();
+  //     getUserIntervall(session); // Och sist denna
+  //   }
+  // }, []);
 
   const getUserByEmail = async (session) => {
     const q = query(
@@ -156,8 +158,7 @@ const index = () => {
 
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
-      console.log("Inga poster hittades för", session);
-      alert("Inga poster hittades för " + session);
+      console.log("Inga poster hittades för ", session);
       return null;
     }
     const userDoc = querySnapshot.docs[0];
@@ -174,8 +175,6 @@ const index = () => {
 
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
-      console.log("Inga poster hittades för", email);
-      alert("Inga poster hittades för", email);
       setIntervalDataInsulin(null);
       setIntervalDataNeedle(null);
       setIntervalDataSensor(null);
@@ -378,26 +377,6 @@ const index = () => {
   };
 
   const showMode = (currentMode, index) => {
-    // if (index === 0) {
-    //   setShowInsulinDateTime(true);
-    //   setShowSensorDateTime(false);
-    //   setShowNeelDateTime(false);
-    //   setShowGlucaGenDateTime(false);
-    //   setShowSparepenLongTermDateTime(false);
-    //   setShowSparepenMealDateTime(false);
-    //   setShowTransmitterDateTime(false);
-    // }
-    // if (index === 1) {
-    //   setShowSensorDateTime(true);
-    //   setShowNeelDateTime(false);
-    //   setShowInsulinDateTime(false);
-    // }
-    // if (index === 2) {
-    //   setShowNeelDateTime(true);
-    //   setShowSensorDateTime(false);
-    //   setShowInsulinDateTime(false);
-    // }
-
     // Första if-satsen: index 0
     if (index === 0) {
       setShowInsulinDateTime(true);
@@ -488,8 +467,6 @@ const index = () => {
     let formattedDate = moment(date)
       .add(days, "days")
       .format("YYYY-MM-DD HH:mm");
-
-    console.log(formattedDate);
     return formattedDate;
   };
 
@@ -677,7 +654,6 @@ const index = () => {
 
   const onPressSparePenMeal = (date) => {
     const _date = addRegDays(date, intervalDataSparepenMeal);
-    console.log("_date", _date);
     setTextSparepenMealColor(isDataAfter(_date) ? "red" : "black");
     setShowSparepenMealDateTime(false);
     setSparepenMealData(_date);
@@ -694,7 +670,7 @@ const index = () => {
 
   return (
     <SafeAreaView className="flex-1  bg-[#74cdcd]">
-      <View className="flex-row mr-3 ml-3">
+      <View className="flex-row mr-3 ml-3 pb-2 pt-2">
         <View>
           <Link
             href={{
