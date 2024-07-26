@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import moment from "moment";
 

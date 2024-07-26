@@ -21,14 +21,12 @@ const Intervall = ({ setIntervalData, intervalData, type, name }) => {
         <View className="">
           <TouchableOpacity
             onPress={() => {
-              setIntervalData(intervalData + 1);
-              dispatch({
-                type: type,
-                payload: intervalData + 1,
-              });
+              if (intervalData > 1) {
+                setIntervalData(intervalData - 1);
+              }
             }}
           >
-            <AntDesign name="pluscircleo" size={34} color="white" />
+            <AntDesign name="minuscircleo" size={34} color="white" />
           </TouchableOpacity>
         </View>
         <View className="">
@@ -37,12 +35,14 @@ const Intervall = ({ setIntervalData, intervalData, type, name }) => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              if (intervalData > 1) {
-                setIntervalData(intervalData - 1);
-              }
+              setIntervalData(intervalData + 1);
+              dispatch({
+                type: type,
+                payload: intervalData + 1,
+              });
             }}
           >
-            <AntDesign name="minuscircleo" size={34} color="white" />
+            <AntDesign name="pluscircleo" size={34} color="white" />
           </TouchableOpacity>
         </View>
       </View>
